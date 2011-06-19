@@ -7,7 +7,7 @@ namespace OlegZee.FractalBrowser.Fractal
 	{
 		private const int SplitTilesCount = 16;
 
-		public override double[,] RenderImpl(int w, int h, Lyapunov.FractalSettings settings)
+		public override double[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
 			var coreRenderer = new LyapRendererCpu();
 
@@ -43,7 +43,10 @@ namespace OlegZee.FractalBrowser.Fractal
 					}, tileIndex);
 			}
 
-			WaitHandle.WaitAll(handles);
+			foreach (var autoResetEvent in handles)
+			{
+				autoResetEvent.WaitOne();
+			}
 
 			return result;
 		}
