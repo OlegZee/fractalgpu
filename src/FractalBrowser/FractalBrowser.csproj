@@ -49,12 +49,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Sz.cs" />
-    <Compile Include="Fractal\LyapRenderer.cs" />
+    <Compile Include="Fractal\FractalRenderer.cs" />
     <Compile Include="Fractal\LyapRendererCpu.cs" />
     <Compile Include="Fractal\LyapRendererMulticore.cs" />
-    <Compile Include="Fractal\Lyapunov.cs" />
+    <Compile Include="Fractal\RenderSettings.cs" />
     <Compile Include="Common\Range.cs" />
-    <Compile Include="Fractal\Lyapunov.FractalSettings.cs" />
+    <Compile Include="Fractal\Lyapunov.Settings.cs" />
     <Compile Include="View\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
