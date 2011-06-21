@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Accelerator, Version=2.1.0.3, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\Microsoft.Accelerator.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -50,7 +54,9 @@
   <ItemGroup>
     <Compile Include="Common\Sz.cs" />
     <Compile Include="Fractal\FractalRenderer.cs" />
+    <Compile Include="Fractal\LyapRendererBase.cs" />
     <Compile Include="Fractal\LyapRendererCpu.cs" />
+    <Compile Include="Fractal\LyapRendererGpu.cs" />
     <Compile Include="Fractal\LyapRendererMulticore.cs" />
     <Compile Include="Fractal\RenderSettings.cs" />
     <Compile Include="Common\Range.cs" />
@@ -86,6 +92,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\libs\x86\Accelerator.dll">
+      <Link>Accelerator.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />
