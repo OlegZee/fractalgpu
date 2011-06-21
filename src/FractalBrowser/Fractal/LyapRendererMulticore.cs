@@ -1,15 +1,28 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using OlegZee.FractalBrowser.Common;
 
 namespace OlegZee.FractalBrowser.Fractal
 {
-	public class LyapRendererMulticore : LyapRendererCpu
+	/// <summary>
+	/// Multicore CPU renderer implementation
+	/// </summary>
+	internal class LyapRendererMulticore<TBaseRenderer> : LyapRendererBase where TBaseRenderer : LyapRendererBase, new()
 	{
-		private const int SplitTilesCount = 16;
+		public LyapRendererMulticore() : this(8)
+		{
+		}
+
+		public LyapRendererMulticore(int tileCount)
+		{
+			SplitTilesCount = tileCount;
+		}
+
+		private readonly int SplitTilesCount;
 
 		public override double[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
-			var coreRenderer = new LyapRendererCpu();
+			var coreRenderer = new TBaseRenderer();
 
 			var result = new double[w, h];
 			var handles = new AutoResetEvent[SplitTilesCount];
