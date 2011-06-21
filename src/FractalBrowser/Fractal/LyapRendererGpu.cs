@@ -15,16 +15,16 @@ namespace OlegZee.FractalBrowser.Fractal
 			// TODO check ShiftDefault, Replicate and such
 			var dimensions = new [] {w, h};
 			var aArray = new float[w,h];
-			var bArray = new float[w, h];
+			var bArray = new float[w,h];
 
-			var ascale = (settings.A.End - settings.A.Start) / w;
-			var bscale = (settings.B.End - settings.B.Start) / h;
+			var bscale = (settings.B.End - settings.B.Start) / w;
+			var ascale = (settings.A.End - settings.A.Start) / h;
 
 			for (var i = 0; i < w; i++)
 			for (var j = 0; j < h; j++)
 			{
-				var va = settings.A.Start + i * ascale;
-				var vb = settings.B.Start + j * bscale;
+				var vb = settings.B.Start + i * bscale;
+				var va = settings.A.Start + j * ascale;
 
 				aArray[i, j] = (float) va;
 				bArray[i, j] = (float) vb;
@@ -47,7 +47,7 @@ namespace OlegZee.FractalBrowser.Fractal
 			{
 				var r = settings.Pattern[i % settings.Pattern.Length] == 'a' ? a : b;
 				x *= r * (1.0f - x);
-				var d = Math.Log2(Math.Abs(r - r*2*x));
+				var d = Math.Log2(Math.Abs(r - 2 * r * x));
 
 				total += d;
 			}

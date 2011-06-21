@@ -35,8 +35,12 @@ namespace OlegZee.FractalBrowser.Fractal
 			// TODO validation
 			// TODO pattern as bool array
 
+			public Settings SetA(double a1, double a2) {return SetA(new Range<double>(a1, a2));}
 			public Settings SetA(Range<double> a) { return Update<Settings>(s => s.A = a); }
+
 			public Settings SetB(Range<double> b) { return Update<Settings>(s => s.B = b); }
+			public Settings SetB(double b1, double b2) { return SetB(new Range<double>(b1, b2)); }
+			
 			public Settings SetInitial(double initial) { return Update<Settings>(s => s.InitialValue = initial); }
 			public Settings SetPattern(string pattern) { return Update<Settings>(s => s.Pattern = pattern); }
 			public Settings SetContrast(double contrast) { return Update<Settings>(s => s.Contrast = contrast); }
