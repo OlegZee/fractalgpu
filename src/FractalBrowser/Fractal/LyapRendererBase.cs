@@ -19,7 +19,6 @@ namespace OlegZee.FractalBrowser.Fractal
 
 		private static Color ColorFromExp(double lyapExp, double contrast)
 		{
-			int colorIntensity;
 			if (Double.IsNegativeInfinity(lyapExp) || Double.IsPositiveInfinity(lyapExp))
 			{
 				return Color.Black;
@@ -30,19 +29,18 @@ namespace OlegZee.FractalBrowser.Fractal
 			}
 			if (lyapExp > 0)
 			{
-				colorIntensity = (int)(Math.Exp(-lyapExp) * 255);
+				var colorIntensity = (int)(Math.Exp(-lyapExp) * 255);
 				return Color.FromArgb(255, 0, 0, 255 - colorIntensity);
 			}
+			else
+			{
+				var colorIntensity = (int) (Math.Exp(lyapExp)*255);
+				colorIntensity = (int) (Math.Pow(colorIntensity, contrast)/Math.Pow(255, (contrast - 1)));
 
-			colorIntensity = (int)(Math.Exp(lyapExp) * 255);
-			colorIntensity = (int)(Math.Pow(colorIntensity, contrast) / Math.Pow(255, (contrast - 1)));
+				colorIntensity = Math.Min(Math.Max(colorIntensity, 0), 255);
 
-			if (colorIntensity > 255)
-				colorIntensity = 255;
-			else if (colorIntensity < 0)
-				colorIntensity = 0;
-
-			return Color.FromArgb(255, colorIntensity, (int)(colorIntensity * .85), 0);
+				return Color.FromArgb(255, colorIntensity, (int) (colorIntensity*.85), 0);
+			}
 		}
 
 		#endregion

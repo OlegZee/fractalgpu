@@ -8,15 +8,15 @@ namespace OlegZee.FractalBrowser.Fractal
 		public override double[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
 			var result = new double[w, h];
-			var ascale = (settings.A.End - settings.A.Start) / w;
-			var bscale = (settings.B.End - settings.B.Start) / h;
+			var bscale = (settings.B.End - settings.B.Start) / w;
+			var ascale = (settings.A.End - settings.A.Start) / h;
 
 			for (var i = 0; i < w; i++)
 			{
 				for (var j = 0; j < h; j++)
 				{
-					var a = settings.A.Start + i * ascale;
-					var b = settings.B.Start + j * bscale;
+					var b = settings.B.Start + i * bscale;
+					var a = settings.A.Start + j * ascale;
 					var pattern = settings.Pattern.ToCharArray().Select(c => c == 'a' ? a : b).ToArray();
 
 					result[i, j] = CalculateExponent(pattern, settings.InitialValue, settings.Warmup, settings.Iterations);

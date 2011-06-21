@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using OlegZee.FractalBrowser.Common;
 
 namespace OlegZee.FractalBrowser.Fractal
@@ -15,29 +14,29 @@ namespace OlegZee.FractalBrowser.Fractal
 
 		public LyapRendererMulticore(int tileCount)
 		{
-			SplitTilesCount = tileCount;
+			_splitTilesCount = tileCount;
 		}
 
-		private readonly int SplitTilesCount;
+		private readonly int _splitTilesCount;
 
 		public override double[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
 			var coreRenderer = new TBaseRenderer();
 
 			var result = new double[w, h];
-			var handles = new AutoResetEvent[SplitTilesCount];
+			var handles = new AutoResetEvent[_splitTilesCount];
 
-			for(var tileIndex = 0; tileIndex < SplitTilesCount; tileIndex++)
+			for(var tileIndex = 0; tileIndex < _splitTilesCount; tileIndex++)
 			{
-				var tileHeight = h/SplitTilesCount;
+				var tileHeight = h/_splitTilesCount;
 				var tileStart = tileHeight*tileIndex;
 				// handle error for last tile
-				if(tileIndex == SplitTilesCount - 1)
-					tileHeight = h - tileHeight*(SplitTilesCount - 1);
+				if(tileIndex == _splitTilesCount - 1)
+					tileHeight = h - tileHeight*(_splitTilesCount - 1);
 
-				var bPerTile = (settings.B.End - settings.B.Start)/SplitTilesCount;
-				var b = settings.B.Start + tileIndex*bPerTile;
-				var tileSettings = settings.SetB(new Range<double>(b, b + bPerTile));
+				var bPerTile = (settings.A.End - settings.A.Start)/_splitTilesCount;
+				var a = settings.A.Start + tileIndex*bPerTile;
+				var tileSettings = settings.SetA(new Range<double>(a, a + bPerTile));
 
 				handles[tileIndex] = new AutoResetEvent(false);
 

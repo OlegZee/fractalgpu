@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using OlegZee.FractalBrowser.Common;
@@ -13,21 +14,43 @@ namespace OlegZee.FractalBrowser.View
 			InitializeComponent();
 		}
 
+		private enum SelectItem {None, First, Last}
+
+		private static void FillCombo<T>(ComboBox combo, Dictionary<string,T> dictionary, SelectItem selItem)
+		{
+			combo.Items.AddRange(dictionary.Select(arg => new TaggedListItem(arg.Key, arg.Value)).ToArray());
+			switch(selItem)
+			{
+				case SelectItem.First: combo.SelectedIndex = 0; break;
+				case SelectItem.Last: combo.SelectedIndex = combo.Items.Count - 1; break;
+			}
+		}
+
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			comboBoxRenderer.Items.Add(new TaggedListItem("CPU", new LyapRendererCpu()));
-			comboBoxRenderer.Items.Add(new TaggedListItem("Multicore CPU", new LyapRendererMulticore<LyapRendererCpu>(8)));
-			comboBoxRenderer.Items.Add(new TaggedListItem("Multicore GPU", new LyapRendererMulticore<LyapRendererGpu>(2)));
-			comboBoxRenderer.Items.Add(new TaggedListItem("GPU", new LyapRendererGpu()));
-			comboBoxRenderer.SelectedIndex = comboBoxRenderer.Items.Count - 1;
+			var renderers = new Dictionary<string,object>
+				{
+					{"CPU", new LyapRendererCpu()},
+					{"Multicore CPU4", new LyapRendererMulticore<LyapRendererCpu>(4)},
+					{"Multicore CPU16", new LyapRendererMulticore<LyapRendererCpu>(16)},
+					{"GPU", new LyapRendererGpu()}
+				};
 
-			
-			comboboxPicSize.Items.AddRange(
-				new[] { 256, 400, 512, 1024, 2048, 4096 }
-				.Select(i => new TaggedListItem(string.Format("{0}x{0}", i), i)).ToArray()
-				);
+			var sizes = new[] { 256, 400, 512, 768, 1024, 1536, 2048, 4096 }
+				.ToDictionary(i1 => string.Format("{0}x{0}", i1), i2 => i2);
 
-			comboboxPicSize.SelectedIndex = 0;
+			var fractalTypes = new Dictionary<string, Func<Lyapunov.Settings, Lyapunov.Settings>>
+				{
+					{"Standard", s => s.SetPattern("ab").SetA(2, 4).SetB(2, 4)},
+					{"Zircon Zity", s => s.SetPattern("bbbbbbaaaaaa").SetA(3.4, 4).SetB(2.5, 3.4)}
+				};
+
+			FillCombo(comboBoxRenderer, renderers, SelectItem.Last);
+			FillCombo(comboboxPicSize, sizes, SelectItem.First);
+			FillCombo(comboBoxFractalType, fractalTypes, SelectItem.First);
+
+			trackBar1.Value = 250;
+			textBox1.Text = GetIterationsCount().ToString();
 		}
 
 		private class TaggedListItem
@@ -49,25 +72,26 @@ namespace OlegZee.FractalBrowser.View
 
 		private void btnStart_Click(object sender, System.EventArgs e)
 		{
-			var picSize = (int)(((TaggedListItem)comboboxPicSize.SelectedItem).Tag);
+			var picSize = GetPictureSize();
 
 			var settings = new Lyapunov.Settings()
-				.SetA(new Range<double>(1, 5))
-				.SetB(new Range<double>(1, 5))
+				.SetA(new Range<double>(2, 4))
+				.SetB(new Range<double>(2, 4))
 				.SetPattern("ab")
 				.SetInitial(0.5)
-				.SetIterations(20, 300)
+				.SetIterations(GetIterationsCount()/10, GetIterationsCount())
 
 				.SetSize(new Sz(picSize, picSize))
 				.SetContrast(1.7);
+
+			settings = GetApplyFractalType()(settings);
 
 			pictureBox1.SizeMode = picSize < pictureBox1.Width ? PictureBoxSizeMode.CenterImage : PictureBoxSizeMode.StretchImage;
 			pictureBox1.Image = null;
 			Update();
 
-			var renderer = (FractalRenderer<Lyapunov.Settings>) (((TaggedListItem) comboBoxRenderer.SelectedItem).Tag);
 			var startTime = DateTime.Now;
-			var bmp = renderer.Render(settings);
+			var bmp = GetRenderer().Render(settings);
 
 			Log("Rendering time: " + (DateTime.Now - startTime));
 			pictureBox1.Image = bmp;
@@ -90,7 +114,7 @@ namespace OlegZee.FractalBrowser.View
 
 			Log("Benchmark started");
 
-			foreach (var picSize in new[] { 100, 512, 2048 })
+			foreach (var picSize in new[] { 100, 512, 1536 })
 			{
 				settings = settings.SetSize(new Sz(picSize, picSize));
 
@@ -110,6 +134,37 @@ namespace OlegZee.FractalBrowser.View
 
 			Log("Benchmark completed.");
 
+		}
+
+		private void trackBar1_Scroll(object sender, EventArgs e)
+		{
+			textBox1.Text = GetIterationsCount().ToString();
+		}
+
+		private int GetIterationsCount()
+		{
+			var value = (int) Math.Pow(10, (double)trackBar1.Value/100);
+			var accuracy = value < 200 ? 20 : value < 1000 ? 50 : 100;
+
+			return value /accuracy * accuracy;
+		}
+
+		private Func<Lyapunov.Settings,Lyapunov.Settings> GetApplyFractalType()
+		{
+			var setSettings = (Func<Lyapunov.Settings, Lyapunov.Settings>)(((TaggedListItem)comboBoxFractalType.SelectedItem).Tag);
+			return setSettings;
+		}
+
+		private int GetPictureSize()
+		{
+			var picSize = (int)(((TaggedListItem)comboboxPicSize.SelectedItem).Tag);
+			return picSize;
+		}
+
+		private FractalRenderer<Lyapunov.Settings> GetRenderer()
+		{
+			var renderer = (FractalRenderer<Lyapunov.Settings>)(((TaggedListItem)comboBoxRenderer.SelectedItem).Tag);
+			return renderer;
 		}
 	}
 }
