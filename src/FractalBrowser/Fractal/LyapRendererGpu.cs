@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Threading;
 using Microsoft.ParallelArrays;
 
 namespace OlegZee.FractalBrowser.Fractal
@@ -28,25 +26,22 @@ namespace OlegZee.FractalBrowser.Fractal
 			var x = new FPA((float)settings.InitialValue, dimensions);
 
 			// creating A,B arrays on the fly a few times faster!
-			var a = new Func<FPA>(() => Math.Replicate(new FPA(aArray), h, w));
-			var b = new Func<FPA>(() => Math.Replicate(new FPA(bArray), h, w));
-			var R = new Func<int, FPA>(i => settings.Pattern[i%settings.Pattern.Length] == 'a' ? a() : b());
+			var fr = new Func<int, FPA>(i => Math.Replicate(new FPA(
+				settings.Pattern[i%settings.Pattern.Length] == 'a' ? aArray :bArray), h, w));
 
 			// warmup cycle, no limit calculation
 			for (var i = 0; i < settings.Warmup; i++)
 			{
-				var r = R(i);
+				var r = fr(i);
 				x *= r * (1.0f - x);
 			}
 
 			var total = new FPA(0, dimensions);
 			for (var i = settings.Warmup; i < settings.Iterations; i++)
 			{
-				var r = R(i);
+				var r = fr(i);
 
-				var d = Math.Log2(Math.Abs(r - 2 * r * x));
-				total += d;
-
+				total += Math.Log2(Math.Abs(r - 2 * r * x));
 				x *= r - r * x;
 			}
 
