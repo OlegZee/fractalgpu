@@ -93,14 +93,16 @@ namespace OlegZee.FractalBrowser.View
 			var startTime = DateTime.Now;
 			var bmp = GetRenderer().Render(settings);
 
-			Log("Rendering time: " + (DateTime.Now - startTime));
+			Log(string.Format("Rendering time: {0}  '{1}' N{2} {3}x{4} @{5}",
+				DateTime.Now - startTime, settings.Pattern, settings.Iterations,
+				settings.Size.Width, settings.Size.Height, comboBoxRenderer.SelectedItem));
+
 			pictureBox1.Image = bmp;
 		}
 
-		private void Log(string text)
+		private void buttonClearLog_Click(object sender, EventArgs e)
 		{
-			listBoxLog.Items.Add(text);
-			listBoxLog.Update();
+			listBoxLog.Items.Clear();
 		}
 
 		private void buttonBenchmark_Click(object sender, EventArgs e)
@@ -166,5 +168,12 @@ namespace OlegZee.FractalBrowser.View
 			var renderer = (FractalRenderer<Lyapunov.Settings>)(((TaggedListItem)comboBoxRenderer.SelectedItem).Tag);
 			return renderer;
 		}
+
+		private void Log(string text)
+		{
+			listBoxLog.Items.Add(text);
+			listBoxLog.Update();
+		}
+
 	}
 }

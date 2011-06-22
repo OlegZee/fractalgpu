@@ -41,6 +41,7 @@
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.labelFractalType = new System.Windows.Forms.Label();
 			this.comboBoxFractalType = new System.Windows.Forms.ComboBox();
+			this.buttonClearLog = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
 			this.SuspendLayout();
@@ -74,9 +75,9 @@
 						| System.Windows.Forms.AnchorStyles.Left)));
 			this.listBoxLog.FormattingEnabled = true;
 			this.listBoxLog.IntegralHeight = false;
-			this.listBoxLog.Location = new System.Drawing.Point(12, 372);
+			this.listBoxLog.Location = new System.Drawing.Point(12, 317);
 			this.listBoxLog.Name = "listBoxLog";
-			this.listBoxLog.Size = new System.Drawing.Size(403, 160);
+			this.listBoxLog.Size = new System.Drawing.Size(403, 215);
 			this.listBoxLog.TabIndex = 11;
 			// 
 			// comboBoxRenderer
@@ -99,7 +100,7 @@
 			// 
 			// buttonBenchmark
 			// 
-			this.buttonBenchmark.Location = new System.Drawing.Point(12, 343);
+			this.buttonBenchmark.Location = new System.Drawing.Point(12, 288);
 			this.buttonBenchmark.Name = "buttonBenchmark";
 			this.buttonBenchmark.Size = new System.Drawing.Size(75, 23);
 			this.buttonBenchmark.TabIndex = 10;
@@ -173,11 +174,22 @@
 			this.comboBoxFractalType.Size = new System.Drawing.Size(142, 21);
 			this.comboBoxFractalType.TabIndex = 1;
 			// 
+			// buttonClearLog
+			// 
+			this.buttonClearLog.Location = new System.Drawing.Point(340, 288);
+			this.buttonClearLog.Name = "buttonClearLog";
+			this.buttonClearLog.Size = new System.Drawing.Size(75, 23);
+			this.buttonClearLog.TabIndex = 12;
+			this.buttonClearLog.Text = "Clear";
+			this.buttonClearLog.UseVisualStyleBackColor = true;
+			this.buttonClearLog.Click += new System.EventHandler(this.buttonClearLog_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(974, 564);
+			this.Controls.Add(this.buttonClearLog);
 			this.Controls.Add(this.comboBoxFractalType);
 			this.Controls.Add(this.labelFractalType);
 			this.Controls.Add(this.textBox1);
@@ -216,6 +228,7 @@
 		private System.Windows.Forms.TextBox textBox1;
 		private System.Windows.Forms.Label labelFractalType;
 		private System.Windows.Forms.ComboBox comboBoxFractalType;
+		private System.Windows.Forms.Button buttonClearLog;
 	}
 }
 
