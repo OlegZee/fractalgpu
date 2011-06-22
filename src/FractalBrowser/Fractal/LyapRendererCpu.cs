@@ -41,7 +41,6 @@ namespace OlegZee.FractalBrowser.Fractal
 			for (var i = warmup; i < iterations; i++)
 			{
 				var r = pattern[i % patternSize];
-				x *= r * (1 - x);
 
 				var d = Math.Log(Math.Abs(r - 2 * r * x));
 
@@ -50,6 +49,8 @@ namespace OlegZee.FractalBrowser.Fractal
 				{
 					return d;
 				}
+
+				x *= r * (1 - x);
 			}
 
 			return total / Math.Log(2) / (iterations - warmup);

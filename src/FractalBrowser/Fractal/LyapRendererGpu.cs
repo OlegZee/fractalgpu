@@ -46,10 +46,11 @@ namespace OlegZee.FractalBrowser.Fractal
 			for (var i = settings.Warmup; i < settings.Iterations; i++)
 			{
 				var r = settings.Pattern[i % settings.Pattern.Length] == 'a' ? a : b;
-				x *= r * (1.0f - x);
-				var d = Math.Log2(Math.Abs(r - 2 * r * x));
 
+				var d = Math.Log2(Math.Abs(r - 2 * r * x));
 				total += d;
+
+				x *= r - r * x;
 			}
 
 			total *= 1f/(settings.Iterations - settings.Warmup);
