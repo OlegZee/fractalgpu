@@ -30,9 +30,9 @@ namespace OlegZee.FractalBrowser.Fractal
 			var ptr0 = bmpData.Scan0;
 			var stride = bmpData.Stride;
 
-			for (var i = 0; i < bmp.Width; i++)
+			for (var i = 0; i < width; i++)
 			{
-				for (var j = 0; j < bmp.Height; j++)
+				for (var j = 0; j < height; j++)
 				{
 					var offset = i * 4 + stride * j;
 					var clr = mapColor(map[i, height - j - 1]).ToArgb();
