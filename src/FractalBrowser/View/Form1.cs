@@ -93,9 +93,12 @@ namespace OlegZee.FractalBrowser.View
 			var startTime = DateTime.Now;
 			var bmp = GetRenderer().Render(settings);
 
-			Log(string.Format("Rendering time: {0}  '{1}' N{2} {3}x{4} @{5}",
-				DateTime.Now - startTime, settings.Pattern, settings.Iterations,
-				settings.Size.Width, settings.Size.Height, comboBoxRenderer.SelectedItem));
+			var execTime = DateTime.Now - startTime;
+			var perf = settings.Size.Width * settings.Size.Height * settings.Iterations/1024/1024/execTime.TotalSeconds;
+
+			Log(string.Format("Rendering time: {0:#0.000}s {6:#0.##}mis '{1}' N{2} {3}x{4} @{5}",
+				execTime.TotalSeconds, settings.Pattern, settings.Iterations,
+				settings.Size.Width, settings.Size.Height, comboBoxRenderer.SelectedItem, perf));
 
 			pictureBox1.Image = bmp;
 		}

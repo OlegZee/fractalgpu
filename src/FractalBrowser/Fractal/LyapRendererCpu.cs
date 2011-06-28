@@ -11,13 +11,19 @@ namespace OlegZee.FractalBrowser.Fractal
 			var bscale = (settings.B.End - settings.B.Start) / w;
 			var ascale = (settings.A.End - settings.A.Start) / h;
 
+			var pattern = new double[settings.Pattern.Length];
+
 			for (var i = 0; i < w; i++)
 			{
 				for (var j = 0; j < h; j++)
 				{
 					var b = settings.B.Start + i * bscale;
 					var a = settings.A.Start + j * ascale;
-					var pattern = settings.Pattern.ToCharArray().Select(c => c == 'a' ? a : b).ToArray();
+
+					for (var k = 0; k < settings.Pattern.Length; k++)
+					{
+						pattern[k] = settings.Pattern[k] == 'a' ? a : b;
+					}
 
 					result[i, j] = CalculateExponent(pattern, settings.InitialValue, settings.Warmup, settings.Iterations);
 				}
