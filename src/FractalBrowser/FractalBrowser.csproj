@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cloo, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\Cloo.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Accelerator, Version=2.1.0.3, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\libs\Microsoft.Accelerator.dll</HintPath>
@@ -53,11 +57,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Sz.cs" />
+    <Compile Include="Fractal\LyapRendererBrahma.cs" />
     <Compile Include="Fractal\FractalRenderer.cs" />
     <Compile Include="Fractal\LyapRendererBase.cs" />
     <Compile Include="Fractal\LyapRendererCpu.cs" />
-    <Compile Include="Fractal\LyapRendererGpu.cs" />
+    <Compile Include="Fractal\LyapRendererGpuMsAccelerator.cs" />
     <Compile Include="Fractal\LyapRendererMulticore.cs" />
+    <Compile Include="Fractal\LyapRendererOpenCl.cs" />
     <Compile Include="Fractal\RenderSettings.cs" />
     <Compile Include="Common\Range.cs" />
     <Compile Include="Fractal\Lyapunov.Settings.cs" />
@@ -98,6 +104,7 @@
       <Link>Accelerator.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="LyapRendererOpenCl.c" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />

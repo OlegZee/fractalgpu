@@ -33,7 +33,8 @@ namespace OlegZee.FractalBrowser.View
 					{"CPU", new LyapRendererCpu()},
 					{"Multicore CPU4", new LyapRendererMulticore<LyapRendererCpu>(4)},
 					{"Multicore CPU16", new LyapRendererMulticore<LyapRendererCpu>(16)},
-					{"GPU", new LyapRendererGpu()}
+					{"GPU (Accelerator.dll)", new LyapRendererGpuMsAccelerator()},
+					{"GPU OpenCL/Cloo", new LyapRendererOpenCl()}
 				};
 
 			var sizes = new[] { 256, 400, 512, 768, 1024, 1536, 2048, 4096 }
@@ -127,7 +128,7 @@ namespace OlegZee.FractalBrowser.View
 
 				foreach (var renderer in new LyapRendererBase[]
 					{
-						new LyapRendererCpu(), new LyapRendererMulticore<LyapRendererCpu>(), new LyapRendererGpu()
+						new LyapRendererCpu(), new LyapRendererMulticore<LyapRendererCpu>(), new LyapRendererGpuMsAccelerator()
 					})
 				{
 					var startTime = DateTime.Now;
