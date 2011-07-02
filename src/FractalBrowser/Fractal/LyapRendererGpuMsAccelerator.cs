@@ -12,7 +12,7 @@ namespace OlegZee.FractalBrowser.Fractal
 	/// <summary>
 	/// Highly parallel GPU fractal renderer implementation
 	/// </summary>
-	internal class LyapRendererGpu : LyapRendererBase
+	internal class LyapRendererGpuMsAccelerator : LyapRendererBase
 	{
 		public override double[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
