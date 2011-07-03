@@ -19,58 +19,54 @@ namespace OlegZee.FractalBrowser.Fractal
 			var aValues = Enumerable.Range(0, h).Select(j => (float)(settings.A.Start + (j) * ascale)).ToArray();
 			var bValues = Enumerable.Range(0, w).Select(i => (float)(settings.B.Start + (i) * bscale)).ToArray();
 
-			// a -> 0
 			var mask = settings.Pattern.ToCharArray().Select(c => c == 'a' ? 0 : 1).ToArray();
 
 			var platform = ComputePlatform.Platforms[0];
-            var properties = new ComputeContextPropertyList(platform);
-            var context = new ComputeContext(platform.Devices, properties, null, IntPtr.Zero);
-
-			Debug.WriteLine(string.Format("Using platform {0}, devices: {1}", platform.Name, 
+			Debug.WriteLine(string.Format("Using platform {0}, devices: {1}", platform.Name,
 				string.Join(", ", platform.Devices.Select(device => device.Name).ToArray()))
 			);
 
+            var properties = new ComputeContextPropertyList(platform);
+            using(var context = new ComputeContext(platform.Devices, properties, null, IntPtr.Zero))
+
 			// create data buffers
-			var aData = new ComputeBuffer<float>(context, ComputeMemoryFlags.ReadOnly | ComputeMemoryFlags.UseHostPointer, aValues);
-			var bData = new ComputeBuffer<float>(context, ComputeMemoryFlags.ReadOnly | ComputeMemoryFlags.UseHostPointer, bValues);
-			var maskData = new ComputeBuffer<int>(context, ComputeMemoryFlags.ReadOnly | ComputeMemoryFlags.UseHostPointer, mask);
+			using(var aData = new ComputeBuffer<float>(context, ComputeMemoryFlags.ReadOnly | ComputeMemoryFlags.UseHostPointer, aValues))
+			using(var bData = new ComputeBuffer<float>(context, ComputeMemoryFlags.ReadOnly | ComputeMemoryFlags.UseHostPointer, bValues))
+			using (var maskData = new ComputeBuffer<int>(context, ComputeMemoryFlags.ReadOnly | ComputeMemoryFlags.UseHostPointer, mask))
+			using (var totalData = new ComputeBuffer<float>(context, ComputeMemoryFlags.WriteOnly, bValues.Length * aValues.Length))
+			using (var program = new ComputeProgram(context, Resources.Lyapunov))
+			{
+				program.Build(null, null, null, IntPtr.Zero);
 
-			var totalValues = new float[bValues.Length * aValues.Length];
-			var totalData = new ComputeBuffer<float>(context, ComputeMemoryFlags.WriteOnly, totalValues.Length);
+				var kernel = program.CreateKernel("Lyapunov");
+				kernel.SetMemoryArgument(0, aData);
+				kernel.SetMemoryArgument(1, bData);
+				kernel.SetMemoryArgument(2, maskData);
+				kernel.SetMemoryArgument(3, totalData);
+				kernel.SetValueArgument(4, (float) settings.InitialValue);
+				kernel.SetValueArgument(5, settings.Warmup);
+				kernel.SetValueArgument(6, settings.Iterations);
+				kernel.SetValueArgument(7, mask.Length);
 
-			var program = new ComputeProgram(context, Resources.LyapRendererOpenCl);
-			program.Build(null, null, null, IntPtr.Zero);
+				var eventList = new ComputeEventList();
+				var commands = new ComputeCommandQueue(context, context.Devices[0], ComputeCommandQueueFlags.None);
 
-			var kernel = program.CreateKernel("Lyapunov");
-			kernel.SetMemoryArgument(0, aData);
-			kernel.SetMemoryArgument(1, bData);
-			kernel.SetMemoryArgument(2, maskData);
-			kernel.SetMemoryArgument(3, totalData);
-			kernel.SetValueArgument(4, (float)settings.InitialValue);
-			kernel.SetValueArgument(5, settings.Warmup);
-			kernel.SetValueArgument(6, mask.Length);
-			kernel.SetValueArgument(7, settings.Iterations);
-			kernel.SetValueArgument(8, bValues.Length);
-			kernel.SetValueArgument(9, 1f / (settings.Iterations - settings.Warmup));
+				commands.Execute(kernel, null, new long[] {aValues.Length, bValues.Length}, null, eventList);
 
-			// TODO reduce number of args
+				var totalValues = new float[bValues.Length * aValues.Length];
+				commands.ReadFromBuffer(totalData, ref totalValues, false, eventList);
 
-			var eventList = new ComputeEventList();
-			var commands = new ComputeCommandQueue(context, context.Devices[0], ComputeCommandQueueFlags.None);
+				commands.Finish();
 
-			commands.Execute(kernel, null, new long[] { aValues.Length, bValues.Length }, null, eventList);
-			commands.ReadFromBuffer(totalData, ref totalValues, false, eventList);
+				var target = new double[w,h];
+				for (var i = 0; i < w; i++)
+					for (var j = 0; j < h; j++)
+					{
+						target[i, j] = totalValues[i + j*w];
+					}
 
-			commands.Finish();
-
-			var target = new double[w, h];
-			for (var i = 0; i < w; i++)
-				for (var j = 0; j < h; j++)
-				{
-					target[i, j] = totalValues[i + j * w];
-				}
-
-			return target;
+				return target;
+			}
 		}
 
 	}
