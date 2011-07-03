@@ -61,25 +61,34 @@ namespace OlegZee.FractalBrowser.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to __kernel void brahmaKernel(__global float* a,__global float* b,__global float* m,__global float* t,float initialX,int warmupCount,int maskLen,int iterationsCount,int columns,float divider)
+        ///   Looks up a localized string similar to kernel void Lyapunov(
+        ///	constant float* a,
+        ///	constant float* b,
+        ///	constant float* m,
+        ///	global write_only float* t,
+        ///	float initialX,
+        ///	int warmupCount,
+        ///	int iterationsCount,
+        ///	int maskLen)
         ///{
         ///	int i = get_global_id(0);
         ///	int j = get_global_id(1);
         ///	float x = initialX;
-        ///	float r = ((float)0);
+        ///
         ///	float bv = b[i];
         ///	float av = a[j];
-        ///	for (int idx = ((int)0); idx &lt; warmupCount; idx++)
+        ///	for (int idx = 0; idx &lt; warmupCount; idx++)
         ///	{
-        ///		(r = ((m[(idx % maskLen)] == ((float)0)) ? av : bv));
-        ///		(x = ((r * x) - ((r * x) * x)));
+        ///		float r = m[idx % maskLen] == 0 ? av : bv;
+        ///		x = r * x - r * x * x;
         ///	}
         ///
-        ///	float total = ((float) [rest of string was truncated]&quot;;.
+        ///	float total = 0;
+        ///	for (int idx = warmupCount; idx &lt; iterationsCount; i [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string LyapRendererOpenCl {
+        internal static string Lyapunov {
             get {
-                return ResourceManager.GetString("LyapRendererOpenCl", resourceCulture);
+                return ResourceManager.GetString("Lyapunov", resourceCulture);
             }
         }
     }

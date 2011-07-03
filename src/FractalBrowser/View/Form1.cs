@@ -128,7 +128,8 @@ namespace OlegZee.FractalBrowser.View
 
 				foreach (var renderer in new LyapRendererBase[]
 					{
-						new LyapRendererCpu(), new LyapRendererMulticore<LyapRendererCpu>(), new LyapRendererGpuMsAccelerator()
+						new LyapRendererCpu(), new LyapRendererMulticore<LyapRendererCpu>(),
+						new LyapRendererGpuMsAccelerator(), new LyapRendererOpenCl()
 					})
 				{
 					var startTime = DateTime.Now;
