@@ -47,6 +47,8 @@ namespace OlegZee.FractalBrowser.Fractal
 				kernel.SetValueArgument(5, settings.Warmup);
 				kernel.SetValueArgument(6, settings.Iterations);
 				kernel.SetValueArgument(7, mask.Length);
+				kernel.SetValueArgument(8, bValues.Length);
+				kernel.SetValueArgument(9, 1f / (settings.Iterations - settings.Warmup));
 
 				var eventList = new ComputeEventList();
 				var commands = new ComputeCommandQueue(context, context.Devices[0], ComputeCommandQueueFlags.None);
