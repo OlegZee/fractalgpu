@@ -29,10 +29,10 @@ namespace OlegZee.FractalBrowser.Fractal
 
 			var wsplit = 1;
 			// empirical rule to split the data for better performance
-			while(w * h / wsplit > 2<<19)
-			{
-				wsplit *= 2;
-			}
+//			while(w * h / wsplit > 2<<19)
+//			{
+//				wsplit *= 2;
+//			}
 
 			var partLength = bValuesRaw.Length/wsplit;
 
@@ -44,13 +44,16 @@ namespace OlegZee.FractalBrowser.Fractal
 			using (var aData = new ComputeBuffer<float>(context, roBufferFlags, aValues))
 			using (var maskData = new ComputeBuffer<int>(context, roBufferFlags, mask))
 			using (var program = new ComputeProgram(context, Resources.Lyapunov))
+			using (var commands = new ComputeCommandQueue(context, context.Devices[0], ComputeCommandQueueFlags.OutOfOrderExecution))
 			{
+				var disposables = new List<IDisposable>();
+
 				program.Build(null, null, null, IntPtr.Zero);
 				var eventList = new ComputeEventList();
-				var commands = new ComputeCommandQueue(context, context.Devices[0], ComputeCommandQueueFlags.None);
 
 				var kernelFunction = program.CreateKernel("Lyapunov");
-				var disposables = new List<IDisposable>();
+
+				disposables.Add(kernelFunction);
 
 				for (var part = 0; part < wsplit; part++)
 				{
@@ -67,10 +70,9 @@ namespace OlegZee.FractalBrowser.Fractal
 					kernelFunction.SetValueArgument(5, settings.Warmup);
 					kernelFunction.SetValueArgument(6, settings.Iterations);
 					kernelFunction.SetValueArgument(7, mask.Length);
-					kernelFunction.SetValueArgument(8, (int)bData.Count);
-					kernelFunction.SetValueArgument(9, 1f/(settings.Iterations - settings.Warmup));
+					kernelFunction.SetValueArgument(8, 1f/(settings.Iterations - settings.Warmup));
 
-					commands.Execute(kernelFunction, null, new long[] {bData.Count, aValues.Length}, null, eventList);
+					commands.Execute(kernelFunction, null, new [] {bData.Count, aValues.Length, 1}, null, eventList);
 					commands.ReadFromBuffer(resultBuffer, ref resultData[part], false, eventList);
 
 					disposables.AddRange(new[]{bData, resultBuffer});

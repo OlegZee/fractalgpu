@@ -50,7 +50,7 @@ namespace OlegZee.FractalBrowser.View
 			FillCombo(comboboxPicSize, sizes, SelectItem.First);
 			FillCombo(comboBoxFractalType, fractalTypes, SelectItem.First);
 
-			trackBar1.Value = 250;
+			trackBar1.Value = trackBar1.Maximum;
 			textBox1.Text = GetIterationsCount().ToString();
 		}
 
