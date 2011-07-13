@@ -3,10 +3,12 @@ using OlegZee.FractalBrowser.Common;
 
 namespace OlegZee.FractalBrowser.Fractal
 {
+	// TODO change to universal multicore renderer
 	/// <summary>
 	/// Multicore CPU renderer implementation
 	/// </summary>
-	internal class LyapRendererMulticore<TBaseRenderer> : LyapRendererBase where TBaseRenderer : LyapRendererBase, new()
+	internal class LyapRendererMulticore<TBaseRenderer> : LyapRendererBase
+		where TBaseRenderer : LyapRendererBase, new()
 	{
 		public LyapRendererMulticore() : this(8)
 		{
