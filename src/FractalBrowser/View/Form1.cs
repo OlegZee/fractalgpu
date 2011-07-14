@@ -43,7 +43,11 @@ namespace OlegZee.FractalBrowser.View
 			var fractalTypes = new Dictionary<string, Func<Lyapunov.Settings, Lyapunov.Settings>>
 				{
 					{"Standard", s => s.SetPattern("ab").SetA(2, 4).SetB(2, 4)},
-					{"Zircon Zity", s => s.SetPattern("bbbbbbaaaaaa").SetA(3.4, 4).SetB(2.5, 3.4)}
+					{"Standard (detail)", s => s.SetPattern("ab").SetA(2.7, 3.3).SetB(3.6, 4)},
+					{"Jellyfish", s => s.SetPattern("bbaba").SetA(3.8225, 3.8711).SetB(3.8218, 3.8607)},
+					{"Zircon Zity", s => s.SetPattern("bbbbbbaaaaaa").SetA(3.4, 4).SetB(2.5, 3.4)},
+					{"aabab", s => s.SetPattern("aabab").SetA(2, 4).SetB(2, 4)},
+					{"aaabbb", s => s.SetPattern("aaabbb").SetA(0, 4).SetB(0, 4)},
 				};
 
 			FillCombo(comboBoxRenderer, renderers, SelectItem.Last);
