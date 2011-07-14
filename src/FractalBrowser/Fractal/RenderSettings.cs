@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using OlegZee.FractalBrowser.Common;
 
 namespace OlegZee.FractalBrowser.Fractal

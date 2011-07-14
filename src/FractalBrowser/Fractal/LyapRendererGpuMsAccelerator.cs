@@ -14,7 +14,7 @@ namespace OlegZee.FractalBrowser.Fractal
 	/// </summary>
 	internal class LyapRendererGpuMsAccelerator : LyapRendererBase
 	{
-		public override double[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
+		public override float[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
 			int splitX, splitY;
 			CalculateSplits(w, h, out splitX, out splitY, settings.Iterations);
@@ -28,7 +28,7 @@ namespace OlegZee.FractalBrowser.Fractal
 			var actions = new List<Action>();
 			var handles = new List<WaitHandle>();
 
-			var target = new double[w, h];
+			var target = new float[w, h];
 
 			using (var dx9Targ = new DX9Target())
 			{
@@ -47,7 +47,7 @@ namespace OlegZee.FractalBrowser.Fractal
 					var asyncResult = dx9Targ.BeginToArray(total, out resultBuffer);
 					handles.Add(asyncResult.AsyncWaitHandle);
 
-					actions.Add(() => CopyToDouble(resultBuffer, target, offsetI, offsetJ));
+					actions.Add(() => CopyTo(resultBuffer, target, offsetI, offsetJ));
 				}
 
 				// for some reason this async call works much more stable than ToArray2D
@@ -127,7 +127,7 @@ namespace OlegZee.FractalBrowser.Fractal
 			return total;
 		}
 
-		private static void CopyToDouble(float[,] array, double[,] target, int off1, int off2)
+		private static void CopyTo(float[,] array, float[,] target, int off1, int off2)
 		{
 			var w = array.GetLength(0);
 			var h = array.GetLength(1);

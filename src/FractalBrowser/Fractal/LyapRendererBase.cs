@@ -12,12 +12,12 @@ namespace OlegZee.FractalBrowser.Fractal
 
 		public override Bitmap Render(Lyapunov.Settings settings)
 		{
-			return Render(settings, d => ColorFromExp(d, settings.Contrast));
+			return Render(settings, d => ColorFromExp(d, (float) settings.Contrast));
 		}
 
 		#region Implementation
 
-		private static Color ColorFromExp(double lyapExp, double contrast)
+		private static Color ColorFromExp(float lyapExp, float contrast)
 		{
 			if (Double.IsNegativeInfinity(lyapExp) || Double.IsPositiveInfinity(lyapExp))
 			{

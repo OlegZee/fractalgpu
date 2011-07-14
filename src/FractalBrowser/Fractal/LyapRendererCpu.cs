@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Linq;
 
 namespace OlegZee.FractalBrowser.Fractal
 {
 	internal class LyapRendererCpu : LyapRendererBase
 	{
-		public override double[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
+		public override float[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
-			var result = new double[w, h];
+			var result = new float[w, h];
 			var bscale = (settings.B.End - settings.B.Start) / w;
 			var ascale = (settings.A.End - settings.A.Start) / h;
 
@@ -25,7 +24,7 @@ namespace OlegZee.FractalBrowser.Fractal
 						pattern[k] = settings.Pattern[k] == 'a' ? a : b;
 					}
 
-					result[i, j] = CalculateExponent(pattern, settings.InitialValue, settings.Warmup, settings.Iterations);
+					result[i, j] = (float) CalculateExponent(pattern, settings.InitialValue, settings.Warmup, settings.Iterations);
 				}
 			}
 

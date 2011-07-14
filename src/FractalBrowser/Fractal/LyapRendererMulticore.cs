@@ -21,11 +21,11 @@ namespace OlegZee.FractalBrowser.Fractal
 
 		private readonly int _splitTilesCount;
 
-		public override double[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
+		public override float[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
 			var coreRenderer = new TBaseRenderer();
 
-			var result = new double[w, h];
+			var result = new float[w, h];
 			var handles = new AutoResetEvent[_splitTilesCount];
 
 			for(var tileIndex = 0; tileIndex < _splitTilesCount; tileIndex++)
