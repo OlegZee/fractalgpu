@@ -12,7 +12,7 @@ namespace OlegZee.FractalBrowser.Fractal
 	/// </summary>
 	internal class LyapRendererOpenCl : LyapRendererBase
 	{
-		public override double[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
+		public override float[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
 			var bscale = (settings.B.End - settings.B.Start)/w;
 			var ascale = (settings.A.End - settings.A.Start)/h;
@@ -72,7 +72,7 @@ namespace OlegZee.FractalBrowser.Fractal
 					kernelFunction.SetValueArgument(7, mask.Length);
 					kernelFunction.SetValueArgument(8, 1f/(settings.Iterations - settings.Warmup));
 
-					commands.Execute(kernelFunction, null, new [] {bData.Count, aValues.Length, 1}, null, eventList);
+					commands.Execute(kernelFunction, null, new [] {bData.Count/4, aValues.Length, 1}, null, eventList);
 					commands.ReadFromBuffer(resultBuffer, ref resultData[part], false, eventList);
 
 					disposables.AddRange(new[]{bData, resultBuffer});
@@ -86,7 +86,7 @@ namespace OlegZee.FractalBrowser.Fractal
 				}
 			}
 
-			var target = new double[w,h];
+			var target = new float[w, h];
 			for (var s = 0; s < wsplit; s++)
 			{
 				var chunk = resultData[s];

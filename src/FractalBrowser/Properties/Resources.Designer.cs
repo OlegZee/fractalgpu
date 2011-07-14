@@ -61,34 +61,37 @@ namespace OlegZee.FractalBrowser.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to kernel void Lyapunov(
+        ///   Looks up a localized string similar to #define NEXT(x,r) (r * x - r * x * x)
+        ///
+        ///kernel void Lyapunov(
         ///	constant float* a,
         ///	constant float* b,
         ///	constant float* m,
         ///	global write_only float* t,
         ///	float initialX,
-        ///	int warmupCount,
-        ///	int iterationsCount,
-        ///	int maskLen)
+        ///	int warmupCount, int iterationsCount,
+        ///	int maskLen, float divider)
         ///{
-        ///	int i = get_global_id(0);
+        ///	int i = get_global_id(0) * 4;
         ///	int j = get_global_id(1);
-        ///	float x = initialX;
         ///
-        ///	float bv = b[i];
-        ///	float av = a[j];
-        ///	for (int idx = 0; idx &lt; warmupCount; idx++)
-        ///	{
-        ///		float r = m[idx % maskLen] == 0 ? av : bv;
-        ///		x = r * x - r * x * x;
-        ///	}
+        ///	int offset = j * get_global_size(0) * 4 + i;
         ///
-        ///	float total = 0;
-        ///	for (int idx = warmupCount; idx &lt; iterationsCount; i [rest of string was truncated]&quot;;.
+        ///	float4 x = (float4)(initialX);
+        ///	float4 bv = (float4)(b[i], b[i+1], b[i+2], b[i+3]);
+        ///	float4 av = (float4)(a[j]);
+        ///	for (int idx = 0; idx &lt; warmupCount [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Lyapunov {
             get {
                 return ResourceManager.GetString("Lyapunov", resourceCulture);
+            }
+        }
+        
+        internal static System.Drawing.Icon LyapunovIcon {
+            get {
+                object obj = ResourceManager.GetObject("LyapunovIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }

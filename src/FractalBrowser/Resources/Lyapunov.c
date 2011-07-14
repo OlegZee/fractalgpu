@@ -9,27 +9,31 @@ kernel void Lyapunov(
 	int warmupCount, int iterationsCount,
 	int maskLen, float divider)
 {
-	int i = get_global_id(0);
+	int i = get_global_id(0) * 4;
 	int j = get_global_id(1);
 
-	int offset = j * get_global_size(0) + i;
+	int offset = j * get_global_size(0) * 4 + i;
 
-	float x = initialX;
-	float bv = b[i];
-	float av = a[j];
+	float4 x = (float4)(initialX);
+	float4 bv = (float4)(b[i], b[i+1], b[i+2], b[i+3]);
+	float4 av = (float4)(a[j]);
 	for (int idx = 0; idx < warmupCount; idx++)
 	{
-		float r = m[idx % maskLen] == 0 ? av : bv;
+		float4 r = m[idx % maskLen] == 0 ? av : bv;
 		x = NEXT(x,r);
 	}
 
-	float total = 0.0f;
+	float4 total = (float4)(0.0f);
 	for (int idx = warmupCount; idx < iterationsCount; idx++)
 	{
-		float r = m[idx % maskLen] == 0 ? av : bv;
+		float4 r = m[idx % maskLen] == 0 ? av : bv;
 		total = total + native_log(fabs(r - r * x * 2.0f));
 		x = NEXT(x,r);
 	}
 
-	t[offset] = total * divider;
+	float4 result = total * divider;
+	t[offset]   = result.s0;
+	t[offset+1] = result.s1;
+	t[offset+2] = result.s2;
+	t[offset+3] = result.s3;
 }

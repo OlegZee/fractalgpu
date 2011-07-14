@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.btnStart = new System.Windows.Forms.Button();
 			this.listBoxLog = new System.Windows.Forms.ListBox();
@@ -203,6 +204,7 @@
 			this.Controls.Add(this.buttonBenchmark);
 			this.Controls.Add(this.btnStart);
 			this.Controls.Add(this.pictureBox1);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "Form1";
 			this.Text = "Fractal browser";
 			this.Load += new System.EventHandler(this.Form1_Load);

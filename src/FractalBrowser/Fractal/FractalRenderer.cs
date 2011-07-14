@@ -8,9 +8,9 @@ namespace OlegZee.FractalBrowser.Fractal
 	public abstract class FractalRenderer<TSettings> where TSettings:RenderSettings
 	{
 		public abstract Bitmap Render(TSettings settings);
-		public abstract double[,] RenderImpl(int w, int h, TSettings settings);
+		public abstract float[,] RenderImpl(int w, int h, TSettings settings);
 
-		protected Bitmap Render(TSettings settings, Func<double, Color> mapColor)
+		protected Bitmap Render(TSettings settings, Func<float, Color> mapColor)
 		{
 			var rc = new Rectangle(0, 0, (int)settings.Size.Width, (int)settings.Size.Height);
 			var map = RenderImpl(rc.Width, rc.Height, settings);
@@ -18,7 +18,7 @@ namespace OlegZee.FractalBrowser.Fractal
 			return CreateBitmap(map, mapColor);
 		}
 
-		protected static Bitmap CreateBitmap(double[,] map, Func<double, Color> mapColor)
+		protected static Bitmap CreateBitmap(float[,] map, Func<float, Color> mapColor)
 		{
 			var width = map.GetLength(0);
 			var height = map.GetLength(1);
