@@ -36,25 +36,76 @@ namespace OlegZee.FractalBrowser.Fractal
 			var x = initial;
 			var patternSize = pattern.Length;
 
-			for (var i = 0; i < warmup; i++)
+			for (var i = 0; i < warmup;)
 			{
-				var r = pattern[i % patternSize];
+				var 
+				r = pattern[i++ % patternSize];
+				x *= r * (1 - x);
+				r = pattern[i++ % patternSize];
+				x *= r * (1 - x);
+				r = pattern[i++ % patternSize];
+				x *= r * (1 - x);
+				r = pattern[i++ % patternSize];
+				x *= r * (1 - x);
+				r = pattern[i++ % patternSize];
+				x *= r * (1 - x);
+				r = pattern[i++ % patternSize];
+				x *= r * (1 - x);
+				r = pattern[i++ % patternSize];
+				x *= r * (1 - x);
+				r = pattern[i++ % patternSize];
+				x *= r * (1 - x);
+				r = pattern[i++ % patternSize];
+				x *= r * (1 - x);
+				r = pattern[i++ % patternSize];
 				x *= r * (1 - x);
 			}
 
 			double total = 0; //For Lyap exp. determination
-			for (var i = warmup; i < iterations; i++)
+			for (var i = warmup; i < iterations;)
 			{
-				var r = pattern[i % patternSize];
-
+				var r = pattern[i++ % patternSize];
 				var d = Math.Log(Math.Abs(r - 2 * r * x));
 
 				total += d;
-				if (Double.IsNaN(d) || Double.IsNegativeInfinity(d) || Double.IsPositiveInfinity(d))
-				{
-					return d;
-				}
+				if (Double.IsNaN(d) || Double.IsNegativeInfinity(d) || Double.IsPositiveInfinity(d)) {return d;}
 
+				x *= r * (1 - x);
+
+				r = pattern[i++ % patternSize];
+				total += Math.Log(Math.Abs(r - 2 * r * x));
+				x *= r * (1 - x);
+
+				r = pattern[i++ % patternSize];
+				total += Math.Log(Math.Abs(r - 2 * r * x));
+				x *= r * (1 - x);
+
+				r = pattern[i++ % patternSize];
+				total += Math.Log(Math.Abs(r - 2 * r * x));
+				x *= r * (1 - x);
+
+				r = pattern[i++ % patternSize];
+				total += Math.Log(Math.Abs(r - 2 * r * x));
+				x *= r * (1 - x);
+
+				r = pattern[i++ % patternSize];
+				total += Math.Log(Math.Abs(r - 2 * r * x));
+				x *= r * (1 - x);
+
+				r = pattern[i++ % patternSize];
+				total += Math.Log(Math.Abs(r - 2 * r * x));
+				x *= r * (1 - x);
+
+				r = pattern[i++ % patternSize];
+				total += Math.Log(Math.Abs(r - 2 * r * x));
+				x *= r * (1 - x);
+
+				r = pattern[i++ % patternSize];
+				total += Math.Log(Math.Abs(r - 2 * r * x));
+				x *= r * (1 - x);
+
+				r = pattern[i++ % patternSize];
+				total += Math.Log(Math.Abs(r - 2 * r * x));
 				x *= r * (1 - x);
 			}
 

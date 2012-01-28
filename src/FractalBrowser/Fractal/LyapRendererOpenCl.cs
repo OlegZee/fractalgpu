@@ -17,7 +17,7 @@ namespace OlegZee.FractalBrowser.Fractal
 			var bscale = (settings.B.End - settings.B.Start)/w;
 			var ascale = (settings.A.End - settings.A.Start)/h;
 
-			var aValues = Enumerable.Range(0, h).Select(j => (float) (settings.A.Start + (j)*ascale)).ToArray();
+			var aValuesRaw = Enumerable.Range(0, h).Select(j => (float) (settings.A.Start + (j)*ascale)).ToArray();
 			var bValuesRaw = Enumerable.Range(0, w).Select(i => (float) (settings.B.Start + (i)*bscale)).ToArray();
 
 			var mask = settings.Pattern.ToCharArray().Select(c => c == 'a' ? 0 : 1).ToArray();
@@ -27,21 +27,21 @@ namespace OlegZee.FractalBrowser.Fractal
 				string.Join(", ", platform.Devices.Select(device => device.Name).ToArray()))
 				);
 
-			var wsplit = 1;
+			var hsplit = 1;
 			// empirical rule to split the data for better performance
-//			while(w * h / wsplit > 2<<19)
-//			{
-//				wsplit *= 2;
-//			}
+			while(w * h / hsplit > 2<<20)
+			{
+				hsplit *= 2;
+			}
 
-			var partLength = bValuesRaw.Length/wsplit;
+			var partLength = aValuesRaw.Length / hsplit;
 
-			var resultData = new float[wsplit][];
+			var resultData = new float[hsplit][];
 			const ComputeMemoryFlags roBufferFlags = ComputeMemoryFlags.ReadOnly | ComputeMemoryFlags.UseHostPointer;
 
 			var properties = new ComputeContextPropertyList(platform);
 			using (var context = new ComputeContext(platform.Devices, properties, null, IntPtr.Zero))
-			using (var aData = new ComputeBuffer<float>(context, roBufferFlags, aValues))
+			using (var bData = new ComputeBuffer<float>(context, roBufferFlags, bValuesRaw))
 			using (var maskData = new ComputeBuffer<int>(context, roBufferFlags, mask))
 			using (var program = new ComputeProgram(context, Resources.Lyapunov))
 			using (var commands = new ComputeCommandQueue(context, context.Devices[0], ComputeCommandQueueFlags.OutOfOrderExecution))
@@ -55,12 +55,12 @@ namespace OlegZee.FractalBrowser.Fractal
 
 				disposables.Add(kernelFunction);
 
-				for (var part = 0; part < wsplit; part++)
+				for (var part = 0; part < hsplit; part++)
 				{
-					var bData = new ComputeBuffer<float>(context, roBufferFlags, bValuesRaw.Skip(part*partLength).Take(partLength).ToArray());
-					var resultBuffer = new ComputeBuffer<float>(context, ComputeMemoryFlags.WriteOnly, partLength*aValues.Length);
+					var aData = new ComputeBuffer<float>(context, roBufferFlags, aValuesRaw.Skip(part*partLength).Take(partLength).ToArray());
+					var resultBuffer = new ComputeBuffer<float>(context, ComputeMemoryFlags.WriteOnly, partLength*bValuesRaw.Length);
 
-					resultData[part] = new float[partLength*aValues.Length];
+					resultData[part] = new float[partLength*bValuesRaw.Length];
 
 					kernelFunction.SetMemoryArgument(0, aData);
 					kernelFunction.SetMemoryArgument(1, bData);
@@ -72,10 +72,10 @@ namespace OlegZee.FractalBrowser.Fractal
 					kernelFunction.SetValueArgument(7, mask.Length);
 					kernelFunction.SetValueArgument(8, 1f/(settings.Iterations - settings.Warmup));
 
-					commands.Execute(kernelFunction, null, new [] {bData.Count/4, aValues.Length, 1}, null, eventList);
+					commands.Execute(kernelFunction, null, new [] {bData.Count/4, aData.Count, 1}, null, eventList);
 					commands.ReadFromBuffer(resultBuffer, ref resultData[part], false, eventList);
 
-					disposables.AddRange(new[]{bData, resultBuffer});
+					disposables.AddRange(new[]{aData, resultBuffer});
 				}
 				commands.Finish();
 
@@ -87,16 +87,16 @@ namespace OlegZee.FractalBrowser.Fractal
 			}
 
 			var target = new float[w, h];
-			for (var s = 0; s < wsplit; s++)
+			for (var s = 0; s < hsplit; s++)
 			{
 				var chunk = resultData[s];
 				var cx = s*partLength;
 
-				for (var i = 0; i < partLength; i++)
+				for (var i = 0; i < w; i++)
 				{
-					for (var j = 0; j < h; j++)
+					for (var j = 0; j < partLength; j++)
 					{
-						target[cx + i, j] = chunk[i + j*partLength];
+						target[i, cx + j] = chunk[i + j * w];
 					}
 				}
 			}

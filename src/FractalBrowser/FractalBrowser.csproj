@@ -116,7 +116,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\libs\x86\Accelerator.dll">
+    <Content Include="..\..\libs\x64\Accelerator.dll">
       <Link>Accelerator.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

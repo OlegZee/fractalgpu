@@ -30,7 +30,8 @@ namespace OlegZee.FractalBrowser.Fractal
 
 			var target = new float[w, h];
 
-			using (var dx9Targ = new DX9Target())
+			//using (var dx9Targ = new DX9Target())
+			using (var dx9Targ = new X64MulticoreTarget())
 			{
 				for (var sx = 0; sx < splitX; sx++)
 				for (var sy = 0; sy < splitY; sy++)
