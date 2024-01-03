@@ -28,10 +28,10 @@ namespace OlegZee.FractalBrowser.Fractal
 
 			var hsplit = 1;
 			// empirical rule to split the data for better performance
-			// while(w * h / hsplit > 2<<20)
-			// {
-			// 	hsplit *= 2;
-			// }
+			while(w * h / hsplit > 2<<20)
+			{
+				hsplit *= 2;
+			}
 
 			var chunkLen = aValuesRaw.Length / hsplit;
 
@@ -70,8 +70,8 @@ namespace OlegZee.FractalBrowser.Fractal
 
 					resultData[chunkIndex] = new float[chunkLen * bValuesRaw.Length];
 
-					kernelFunction.SetMemoryArgument(0, aData);
-					kernelFunction.SetMemoryArgument(1, bData);
+					kernelFunction.SetMemoryArgument(0, bData);
+					kernelFunction.SetMemoryArgument(1, aData);
 					kernelFunction.SetMemoryArgument(2, resultBuffer);
 					kernelFunction.SetMemoryArgument(3, maskData);
 					kernelFunction.SetValueArgument(4, (float) settings.InitialValue);
@@ -80,7 +80,7 @@ namespace OlegZee.FractalBrowser.Fractal
 					kernelFunction.SetValueArgument(7, mask.Length);
 					kernelFunction.SetValueArgument(8, 1f/(settings.Iterations - settings.Warmup));
 
-					commands.Execute(kernelFunction, null, new long[] { chunkLen/4, bValuesRaw.Length }, null, eventList);
+					commands.Execute(kernelFunction, null, new long[] { bValuesRaw.Length/4, chunkLen }, null, eventList);
 					commands.ReadFromBuffer(resultBuffer, ref resultData[chunkIndex], false, eventList);
 				}
 				commands.Finish();
@@ -97,12 +97,12 @@ namespace OlegZee.FractalBrowser.Fractal
 			for (var chIdx = 0; chIdx < hsplit; chIdx++)
 			{
 				var chunk = resultData[chIdx];
-				var cx = chIdx * chunkLen;
+				var rowOffset = chIdx * chunkLen;
 			
 				for (var j = 0; j < chunkLen; j++)
 				for (var i = 0; i < w; i++)
 				{
-					target[i, cx + j] = chunk[i + j * w];
+					target[i, rowOffset + j] = chunk[i + j * w];
 				}
 			}
 

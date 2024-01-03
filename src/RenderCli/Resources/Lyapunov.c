@@ -1,8 +1,8 @@
 ﻿#define NEXT(x,r) (r * x - r * x * x)
 
 kernel void Lyapunov(
-	__global float* a,
 	__global float* b,
+	__global float* a,
 	__global /*__write_only*/ float* t,
 	__global int * m,
 	float initialX,
@@ -14,8 +14,8 @@ kernel void Lyapunov(
 	int j = get_global_id(1);
 	
 	float4 x = (float4)(initialX);
-	float4 av = (float4)(a[i], a[i+1], a[i+2], a[i+3]);
-	float4 bv = (float4)(b[j]);
+	float4 bv = (float4)(b[i], b[i+1], b[i+2], b[i+3]);
+	float4 av = (float4)(a[j]);
 	for (int idx = 0; idx < warmupCount; idx++)
 	{
 		float4 r = m[idx % maskLen] == 0 ? av : bv;
