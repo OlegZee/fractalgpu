@@ -1,18 +1,7 @@
-﻿using OlegZee.FractalBrowser.Common;
-using OlegZee.FractalBrowser.Fractal;
+﻿using FractalGpu.RenderCli.Common;
+using FractalGpu.RenderCli.Fractal;
 
-// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
-
-var devices = (from p in Cloo.ComputePlatform.Platforms
-    from d in p.Devices
-    select (p, d)).ToArray();
-foreach (var (p, d) in devices)
-{
-    Console.WriteLine($"Platform: {p.Name}, device: {d.Name}");
-}
-Console.WriteLine(devices.Length == 0 ? "NO DEVICES FOUND" : $"Devices list is OK");
-
+Console.WriteLine("fractalgpu benchmark");
 
 void Render()
 {
@@ -29,17 +18,15 @@ void Render()
         .SetSize(new Sz(picSize, picSize))
         .SetContrast(1.7);
 
-    // pictureBox1.SizeMode = picSize < pictureBox1.Width ? PictureBoxSizeMode.CenterImage : PictureBoxSizeMode.StretchImage;
-    // pictureBox1.Image = null;
-    // Update();
-
     var startTime = DateTime.Now;
-    var renderer = 2 switch
+    Func<LyapRendererBase> makeRenderer = 2 switch
     {
-        0 => (LyapRendererBase) new LyapRendererCpu(),
-        1 => new LyapRendererMulticore<LyapRendererCpu>(10),
-        2 => new LyapRendererOpenCl(),
+        0 => () => new LyapRendererCpu(),
+        1 => () => new LyapRendererMulticore<LyapRendererCpu>(10),
+        2 => () => new LyapRendererOpenCl(),
+        _ => throw new ArgumentException("Unknown renderer type")
     };
+    var renderer = makeRenderer();
     var bmp = renderer.Render(settings);
 
     var execTime = DateTime.Now - startTime;

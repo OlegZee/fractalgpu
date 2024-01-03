@@ -1,7 +1,6 @@
-﻿using System;
-using OlegZee.FractalBrowser.Common;
+﻿using FractalGpu.RenderCli.Common;
 
-namespace OlegZee.FractalBrowser.Fractal
+namespace FractalGpu.RenderCli.Fractal
 {
 	/// <summary>
 	/// Fractal rendering settings

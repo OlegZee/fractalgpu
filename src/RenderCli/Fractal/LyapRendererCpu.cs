@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace OlegZee.FractalBrowser.Fractal
+﻿namespace FractalGpu.RenderCli.Fractal
 {
 	internal class LyapRendererCpu : LyapRendererBase
 	{
