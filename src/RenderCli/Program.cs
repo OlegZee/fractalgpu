@@ -39,7 +39,6 @@ void Render()
         0 => (LyapRendererBase) new LyapRendererCpu(),
         1 => new LyapRendererMulticore<LyapRendererCpu>(10),
         2 => new LyapRendererOpenCl(),
-        3 => new LyapRendererOpenClNew(),
     };
     var bmp = renderer.Render(settings);
 
