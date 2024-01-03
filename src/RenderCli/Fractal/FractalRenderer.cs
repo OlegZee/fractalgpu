@@ -1,11 +1,7 @@
-﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
+﻿using System.Drawing;
+using FractalGpu.RenderCli.Media;
 
-using OlegZee.Fractal.Media;
-
-namespace OlegZee.FractalBrowser.Fractal
+namespace FractalGpu.RenderCli.Fractal
 {
 	public abstract class FractalRenderer<TSettings> where TSettings:RenderSettings
 	{
@@ -28,19 +24,17 @@ namespace OlegZee.FractalBrowser.Fractal
 			var bmp = new RawBitmap(width, height);
 			// var bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
 
-			// Using pointer arithmethic to copy all the bits
+			// Using pointer arithmetic to copy all the bits
 			// var ptr0 = bmpData.Scan0;
 			// var stride = bmpData.Stride;
 
 			for (var i = 0; i < width; i++)
+			for (var j = 0; j < height; j++)
 			{
-				for (var j = 0; j < height; j++)
-				{
-					// var offset = i * 4 + stride * j;
-					var clr = mapColor(map[i, height - j - 1]);
-					// Marshal.WriteInt32(ptr0, offset, clr);
-					bmp.SetPixel(i, j, clr);
-				}
+				// var offset = i * 4 + stride * j;
+				var clr = mapColor(map[i, height - j - 1]);
+				// Marshal.WriteInt32(ptr0, offset, clr);
+				bmp.SetPixel(i, j, clr);
 			}
 
 			// bmp.UnlockBits(bmpData);

@@ -1,7 +1,6 @@
-﻿using System.Threading;
-using OlegZee.FractalBrowser.Common;
+﻿using FractalGpu.RenderCli.Common;
 
-namespace OlegZee.FractalBrowser.Fractal
+namespace FractalGpu.RenderCli.Fractal
 {
 	// TODO change to universal multicore renderer
 	/// <summary>
@@ -53,7 +52,7 @@ namespace OlegZee.FractalBrowser.Fractal
 							result[i, j + tileStart] = tileResult[i, j];
 						}
 
-						handles[(int)state].Set();
+						handles[(int)state!].Set();
 					}, tileIndex);
 			}
 

@@ -1,4 +1,4 @@
-namespace OlegZee.Fractal.Media;
+namespace FractalGpu.RenderCli.Media;
 
 public struct RawColor
 {
@@ -19,9 +19,9 @@ public struct RawColor
 
     public static RawColor Random(Random rand)
     {
-        byte r = (byte)rand.Next(256);
-        byte g = (byte)rand.Next(256);
-        byte b = (byte)rand.Next(256);
+        var r = (byte)rand.Next(256);
+        var g = (byte)rand.Next(256);
+        var b = (byte)rand.Next(256);
         return new RawColor(r, g, b);
     }
 

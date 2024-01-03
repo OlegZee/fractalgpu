@@ -1,17 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using Cloo;
-using OlegZee.Fractal;
 
-namespace OlegZee.FractalBrowser.Fractal
+namespace FractalGpu.RenderCli.Fractal
 {
 	/// <summary>
-	/// Fractal renderer implementation using Brahma GPU library
+	/// Fractal renderer implementation on OpenCL/Cloo.
 	/// </summary>
 	internal class LyapRendererOpenCl : LyapRendererBase
 	{
+		public LyapRendererOpenCl()
+		{
+			var devices = (from p in Cloo.ComputePlatform.Platforms
+				from d in p.Devices
+				select (p, d)).ToArray();
+			foreach (var (p, d) in devices)
+			{
+				Trace.WriteLine($"Platform: {p.Name}, device: {d.Name}");
+			}
+			Trace.WriteLine(devices.Length == 0 ? "NO DEVICES FOUND" : $"Devices list is OK");
+			if (devices.Length == 0) throw new Exception("GPU/OpenCL drivers not found");
+		}
+		
 		public override float[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
 			var bscale = (settings.B.End - settings.B.Start)/w;
@@ -51,7 +60,7 @@ namespace OlegZee.FractalBrowser.Fractal
 				{
 					program.Build(new List<ComputeDevice> { device }, null, null, IntPtr.Zero);
 				}
-				catch (Exception e)
+				catch (Exception)
 				{
 					Console.WriteLine(program.GetBuildLog(device));
 				}

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Drawing;
+﻿using FractalGpu.RenderCli.Media;
 
-using OlegZee.Fractal.Media;
-
-namespace OlegZee.FractalBrowser.Fractal
+namespace FractalGpu.RenderCli.Fractal
 {
 	/// <summary>
 	/// CPU based renderer implementation
@@ -21,11 +18,11 @@ namespace OlegZee.FractalBrowser.Fractal
 
 		private static RawColor ColorFromExp(float lyapExp, float contrast)
 		{
-			if (Double.IsNegativeInfinity(lyapExp) || Double.IsPositiveInfinity(lyapExp))
+			if (double.IsNegativeInfinity(lyapExp) || Double.IsPositiveInfinity(lyapExp))
 			{
 				return RawColor.Black;
 			}
-			if (Double.IsNaN(lyapExp))
+			if (double.IsNaN(lyapExp))
 			{
 				return RawColor.White;
 			}

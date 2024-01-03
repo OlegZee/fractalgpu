@@ -1,21 +1,17 @@
-﻿using System;
-
-namespace OlegZee.FractalBrowser.Common
+﻿namespace FractalGpu.RenderCli.Common
 {
 	/// <summary>
 	/// Defines Size object
 	/// </summary>
-	public struct Sz
+	public readonly struct Sz
 	{
-		private readonly double _width, _height;
-
 		public Sz(double width, double height) : this()
 		{
-			_width = width;
-			_height = height;
+			Width = width;
+			Height = height;
 		}
 
-		public double Width { get { return _width; } }
-		public double Height { get { return _height; } }
+		public double Width { get; }
+		public double Height { get; }
 	}
 }
