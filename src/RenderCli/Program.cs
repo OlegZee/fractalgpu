@@ -83,7 +83,7 @@ void Benchmark(Renderer rendererType)
 LyapRendererBase makeRenderer(Renderer r) => r switch
 {
     Renderer.SingleCpu => new LyapRendererCpu(),
-    Renderer.MultiCore => new LyapRendererMulticore<LyapRendererCpu>(192),
+    Renderer.MultiCore => new LyapRendererMulticore<LyapRendererCpu>(256),
     Renderer.Gpu => new LyapRendererOpenCl(),
     _ => throw new ArgumentException("Unknown renderer type")
 };
