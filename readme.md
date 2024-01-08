@@ -1,3 +1,13 @@
+## Running Benchmark
+
+Prerequisites:
+- Dotnet SDK 7.0+
+
+```bash
+cd src/RenderCli
+dotnet run -c Release
+```
+
 ## Running under Macos
 
 There's unclear issue with OpenCL path resolution, which I suppose is a netcore issue.
