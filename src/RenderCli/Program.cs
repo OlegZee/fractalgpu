@@ -1,4 +1,6 @@
-﻿using FractalGpu.RenderCli.Common;
+﻿using System.Runtime.InteropServices;
+
+using FractalGpu.RenderCli.Common;
 using FractalGpu.RenderCli.Fractal;
 
 void Render(LyapRendererBase renderer, string? fileName)
@@ -92,10 +94,16 @@ Console.WriteLine("fractalgpu benchmark");
 // var renderer = makeRenderer(Renderer.Gpu);
 // Render(renderer, "testN.bmp");
 
+if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+{
+    var path = System.Environment.GetEnvironmentVariable("DYLD_LIBRARY_PATH");
+    System.Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", path + ":/System/Library/Frameworks/OpenCL.framework");
+}
+
 Console.WriteLine("Single-core tests\n=================");
-Benchmark(Renderer.SingleCpu);
+// Benchmark(Renderer.SingleCpu);
 Console.WriteLine("Multi-core tests\n=================");
-Benchmark(Renderer.MultiCore);
+// Benchmark(Renderer.MultiCore);
 Console.WriteLine("GPU tests\n=================");
 Benchmark(Renderer.Gpu);
 
