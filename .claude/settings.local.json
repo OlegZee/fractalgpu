@@ -3,7 +3,29 @@
     "allow": [
       "mcp__archon__get_available_sources",
       "mcp__archon__perform_rag_query",
-      "mcp__serena__search_for_pattern"
+      "mcp__serena__search_for_pattern",
+
+      "Edit",
+      "Read",
+      "Write",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm:*)",
+      "Bash(yarn:*)",
+      "Bash(dotnet:*)",
+
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(source:*)",
+      "Bash(find:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(ruff:*)",
+      "Bash(touch:*)",
+      "Bash(cat:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:github.com)"
     ]
   },
   "enableAllProjectMcpServers": true,
