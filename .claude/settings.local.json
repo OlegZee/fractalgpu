@@ -4,7 +4,6 @@
       "mcp__archon__get_available_sources",
       "mcp__archon__perform_rag_query",
       "mcp__serena__search_for_pattern",
-
       "Edit",
       "Read",
       "Write",
@@ -13,7 +12,6 @@
       "Bash(npm:*)",
       "Bash(yarn:*)",
       "Bash(dotnet:*)",
-
       "Bash(grep:*)",
       "Bash(ls:*)",
       "Bash(source:*)",
@@ -25,7 +23,12 @@
       "Bash(touch:*)",
       "Bash(cat:*)",
       "WebFetch(domain:docs.anthropic.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "mcp__archon__list_projects",
+      "mcp__serena__list_dir",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__find_symbol",
+      "WebSearch"
     ]
   },
   "enableAllProjectMcpServers": true,
