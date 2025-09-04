@@ -1,0 +1,6 @@
+@FractalGpu.RenderServer_HostAddress = http://localhost:5229
+
+GET {{FractalGpu.RenderServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

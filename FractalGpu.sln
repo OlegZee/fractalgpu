@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{146934AA-1E29-407E-8225-2A5DA4C782C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FractalGpu.Rendering", "src\FractalGpu.Rendering\FractalGpu.Rendering.csproj", "{382F197E-FC6B-46EF-B61D-0F085BBD5DB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FractalGpu.Benchmark", "src\FractalGpu.Benchmark\FractalGpu.Benchmark.csproj", "{DA4A1EC7-803F-4944-B658-2B6428FD9806}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FractalGpu.RenderServer", "src\FractalGpu.RenderServer\FractalGpu.RenderServer.csproj", "{864471FD-CF03-4E1F-8C12-FA35F3EE3AA0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{382F197E-FC6B-46EF-B61D-0F085BBD5DB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{382F197E-FC6B-46EF-B61D-0F085BBD5DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{382F197E-FC6B-46EF-B61D-0F085BBD5DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{382F197E-FC6B-46EF-B61D-0F085BBD5DB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA4A1EC7-803F-4944-B658-2B6428FD9806}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA4A1EC7-803F-4944-B658-2B6428FD9806}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA4A1EC7-803F-4944-B658-2B6428FD9806}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA4A1EC7-803F-4944-B658-2B6428FD9806}.Release|Any CPU.Build.0 = Release|Any CPU
+		{864471FD-CF03-4E1F-8C12-FA35F3EE3AA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{864471FD-CF03-4E1F-8C12-FA35F3EE3AA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{864471FD-CF03-4E1F-8C12-FA35F3EE3AA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{864471FD-CF03-4E1F-8C12-FA35F3EE3AA0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{382F197E-FC6B-46EF-B61D-0F085BBD5DB1} = {146934AA-1E29-407E-8225-2A5DA4C782C1}
+		{DA4A1EC7-803F-4944-B658-2B6428FD9806} = {146934AA-1E29-407E-8225-2A5DA4C782C1}
+		{864471FD-CF03-4E1F-8C12-FA35F3EE3AA0} = {146934AA-1E29-407E-8225-2A5DA4C782C1}
+	EndGlobalSection
+EndGlobal
