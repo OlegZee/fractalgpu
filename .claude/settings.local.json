@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__archon__get_available_sources",
+      "mcp__archon__perform_rag_query",
+      "mcp__serena__search_for_pattern"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "serena"
+  ]
+}
