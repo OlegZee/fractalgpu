@@ -1,11 +1,10 @@
 ## Running Benchmark
 
 Prerequisites:
-- Dotnet SDK 7.0+
+- Dotnet SDK 9.0+
 
 ```bash
-cd src/RenderCli
-dotnet run -c Release
+dotnet run -c Release -p src/FractalGpu.Benchmark
 ```
 
 ## Running under Macos

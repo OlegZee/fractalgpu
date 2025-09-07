@@ -14,8 +14,8 @@ kernel void Lyapunov(
 	int j = get_global_id(1);
 	
 	float4 x = (float4)(initialX);
-	float4 bv = (float4)(b[i], b[i+1], b[i+2], b[i+3]);
-	float4 av = (float4)(a[j]);
+    float4 bv = vload4(i/4, b);
+    float4 av = (float4)(a[j]);
 	for (int idx = 0; idx < warmupCount; idx++)
 	{
 		float4 r = m[idx % maskLen] == 0 ? av : bv;
@@ -30,11 +30,7 @@ kernel void Lyapunov(
 		x = NEXT(x,r);
 	}
 
-	float4 result = total * divider;
-	int offset = j * get_global_size(0) * 4 + i;
-
-	t[offset]   = result.s0;
-	t[offset+1] = result.s1;
-	t[offset+2] = result.s2;
-	t[offset+3] = result.s3;
+    // Store result
+    int offset = j * get_global_size(0) * 4 + i;
+    vstore4(total * divider, offset/4, t);
 }
