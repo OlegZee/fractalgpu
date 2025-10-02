@@ -30,7 +30,15 @@
       "mcp__serena__find_symbol",
       "WebSearch",
       "Bash(cp:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Read(//System/Library/Frameworks/OpenCL.framework/**)",
+      "mcp__serena__find_file",
+      "Read(//Users/olegz/.nuget/packages/cloo.clsharp/1.0.1/**)",
+      "Bash(unzip:*)",
+      "Read(//private/tmp/**)",
+      "Bash(otool:*)",
+      "Bash(ilspycmd:*)",
+      "mcp__serena__insert_before_symbol"
     ]
   },
   "enableAllProjectMcpServers": true,

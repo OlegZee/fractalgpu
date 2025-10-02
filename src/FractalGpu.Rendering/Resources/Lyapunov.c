@@ -10,9 +10,9 @@ kernel void Lyapunov(
 	int maskLen, float divider)
 {
 	// it calculates vector of 4 values (GPU efficiency)
-	int i = get_global_id(0) * 4;
+	int i = get_global_id(0);
 	int j = get_global_id(1);
-	
+
 	float4 x = (float4)(initialX);
     float4 bv = vload4(i, b);
     float4 av = (float4)(a[j]);
@@ -31,6 +31,6 @@ kernel void Lyapunov(
 	}
 
     // Store result
-    int offset = j * get_global_size(0) * 4 + i;
+    int offset = j * get_global_size(0) + i;
     vstore4(total * divider, offset, t);
 }

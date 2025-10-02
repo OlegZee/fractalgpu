@@ -7,15 +7,22 @@ Prerequisites:
 dotnet run -c Release -p src/FractalGpu.Benchmark
 ```
 
-## Running under Macos
+## Running under macOS
 
-There's unclear issue with OpenCL path resolution, which I suppose is a netcore issue.
+**No special configuration needed!** The OpenCL library loading is handled automatically via `NativeLibrary.SetDllImportResolver` in the rendering code.
 
-In order to fix the issue run the following command before executing application:
+<details>
+<summary>Legacy DYLD_LIBRARY_PATH approach (deprecated)</summary>
+
+The old workaround using `DYLD_LIBRARY_PATH` is no longer necessary:
 
 ```bash
+# NOT NEEDED ANYMORE
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/System/Library/Frameworks/OpenCL.framework
 ```
+
+This approach is considered bad practice on modern macOS and doesn't work reliably with System Integrity Protection (SIP).
+</details>
 
 ## Running macos WinViewer application
 
