@@ -33,9 +33,7 @@ dotnet build -c Release
 
 ### macOS OpenCL Setup
 
-**No configuration needed!** OpenCL library loading is handled automatically using `NativeLibrary.SetDllImportResolver` in `LyapRendererOpenCl.cs`. The code automatically detects macOS and loads the OpenCL framework from `/System/Library/Frameworks/OpenCL.framework/OpenCL`.
-
-The old `DYLD_LIBRARY_PATH` workaround is deprecated and no longer necessary.
+OpenCL library loading is handled automatically using `NativeLibrary.SetDllImportResolver` in `LyapRendererOpenCl.cs`. The code detects macOS/Mac Catalyst and loads the system OpenCL framework without additional configuration.
 
 ### Legacy Windows Forms App
 
