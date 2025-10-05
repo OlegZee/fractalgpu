@@ -96,8 +96,18 @@ Console.WriteLine("fractalgpu benchmark");
 
 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 {
-    var path = System.Environment.GetEnvironmentVariable("DYLD_LIBRARY_PATH");
-    System.Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", path + ":/System/Library/Frameworks/OpenCL.framework");
+    const string openClFrameworkPath = "/System/Library/Frameworks/OpenCL.framework";
+    var current = Environment.GetEnvironmentVariable("DYLD_LIBRARY_PATH");
+
+    if (string.IsNullOrEmpty(current))
+    {
+        Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", openClFrameworkPath);
+    }
+    else if (!current.Split(':', StringSplitOptions.RemoveEmptyEntries)
+        .Any(segment => string.Equals(segment, openClFrameworkPath, StringComparison.Ordinal)))
+    {
+        Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", $"{current}:{openClFrameworkPath}");
+    }
 }
 
 Console.WriteLine("Single-core tests\n=================");

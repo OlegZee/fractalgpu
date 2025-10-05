@@ -37,13 +37,22 @@ namespace FractalGpu.Rendering.Fractal
             IntPtr handle = IntPtr.Zero;
 
             // Try macOS framework path first
-            if (OperatingSystem.IsMacOS())
+            if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
             {
-                var frameworkPath = "/System/Library/Frameworks/OpenCL.framework/OpenCL";
-                if (System.Runtime.InteropServices.NativeLibrary.TryLoad(frameworkPath, out handle))
+                var macCandidates = new[]
                 {
-                    Trace.WriteLine($"Loaded OpenCL from macOS framework: {frameworkPath}");
-                    return handle;
+                    "/System/Library/Frameworks/OpenCL.framework/OpenCL",
+                    "/System/Library/Frameworks/OpenCL.framework/Versions/Current/OpenCL",
+                    "/System/Library/Frameworks/OpenCL.framework/Libraries/libOpenCL.dylib"
+                };
+
+                foreach (var frameworkPath in macCandidates)
+                {
+                    if (System.Runtime.InteropServices.NativeLibrary.TryLoad(frameworkPath, out handle))
+                    {
+                        Trace.WriteLine($"Loaded OpenCL from macOS framework: {frameworkPath}");
+                        return handle;
+                    }
                 }
             }
 

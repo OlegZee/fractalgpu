@@ -132,14 +132,30 @@ public class RenderBackgroundService : BackgroundService
     private void SetupOpenClEnvironment()
     {
         // Setup OpenCL environment for macOS
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || OperatingSystem.IsMacCatalyst())
         {
-            var path = Environment.GetEnvironmentVariable("DYLD_LIBRARY_PATH");
-            if (string.IsNullOrEmpty(path) || !path.Contains("OpenCL.framework"))
+            const string openClFrameworkPath = "/System/Library/Frameworks/OpenCL.framework";
+            var current = Environment.GetEnvironmentVariable("DYLD_LIBRARY_PATH");
+
+            bool PathMissing()
             {
-                var newPath = path + ":/System/Library/Frameworks/OpenCL.framework";
-                Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", newPath);
-                _logger.LogInformation("Set DYLD_LIBRARY_PATH for OpenCL on macOS");
+                if (string.IsNullOrEmpty(current))
+                {
+                    return true;
+                }
+
+                var segments = current.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                return !segments.Any(segment => string.Equals(segment, openClFrameworkPath, StringComparison.Ordinal));
+            }
+
+            if (PathMissing())
+            {
+                var updated = string.IsNullOrEmpty(current)
+                    ? openClFrameworkPath
+                    : $"{current}:{openClFrameworkPath}";
+
+                Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", updated);
+                _logger.LogInformation("Ensured DYLD_LIBRARY_PATH includes OpenCL framework for macOS");
             }
         }
     }

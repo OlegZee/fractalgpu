@@ -127,9 +127,8 @@ src/
 
 ### Known Gotchas of our codebase & Library Quirks
 ```csharp
-// CRITICAL: OpenCL setup required on macOS
-// Must set DYLD_LIBRARY_PATH=/System/Library/Frameworks/OpenCL.framework
-// See Program.cs RuntimeInformation.IsOSPlatform(OSPlatform.OSX) block
+// CRITICAL: OpenCL resolver handles macOS/Mac Catalyst automatically
+// See LyapRendererOpenCl for the NativeLibrary resolver setup
 
 // CRITICAL: Cloo.clSharp dependency for OpenCL
 // Project currently uses Cloo.clSharp v1.0.1 NuGet package
@@ -376,9 +375,6 @@ ROUTES:
 dotnet build                         # Build all projects in solution
 dotnet format                        # Auto-format code
 dotnet restore                       # Restore NuGet packages
-
-# macOS OpenCL setup if testing GPU renderer
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/System/Library/Frameworks/OpenCL.framework
 
 # Expected: No compilation errors. If errors, READ the error and fix.
 ```

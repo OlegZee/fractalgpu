@@ -35,12 +35,6 @@ The project is organized as a solution with multiple projects:
 - .NET SDK 9.0 or higher
 - OpenCL drivers for GPU acceleration (if using OpenCL)
 
-### macOS Specific Setup
-Due to OpenCL path resolution issues on macOS, run this command before executing applications:
-```bash
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/System/Library/Frameworks/OpenCL.framework
-```
-
 ### Running Components
 
 #### Benchmark
