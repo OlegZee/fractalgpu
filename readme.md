@@ -1,3 +1,7 @@
+# FractalGPU
+
+Copyright (c) 2025 FractalGPU Project. All rights reserved.
+
 ## Running Benchmark
 
 Prerequisites:
