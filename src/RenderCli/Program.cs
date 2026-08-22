@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.CommandLine;
 
 using FractalGpu.RenderCli.Common;
 using FractalGpu.RenderCli.Fractal;
@@ -31,9 +31,9 @@ void Render(LyapRendererBase renderer, string? fileName)
     if(!string.IsNullOrEmpty(fileName)) bmp.Save(fileName);
 }
 
-void Benchmark(Renderer rendererType)
+void Benchmark(DeviceDescriptor device)
 {
-    var renderer = makeRenderer(rendererType);
+    var renderer = device.CreateRenderer();
     var picSize = 256;
     var numIterations = 1000;
     
@@ -82,44 +82,42 @@ void Benchmark(Renderer rendererType)
     } while (execTime.TotalSeconds < 2.5 && stepIndex < steps.Length);
 }
 
-LyapRendererBase makeRenderer(Renderer r) => r switch
+var deviceOption = new Option<int?>("--device", "-d")
+    { Description = "Device index from 'list-devices' (default: first GPU, else multi-core CPU)" };
+
+var benchmarkCommand = new Command("benchmark", "Run the escalating render benchmark on a selected device");
+benchmarkCommand.Options.Add(deviceOption);
+benchmarkCommand.SetAction(parseResult =>
 {
-    Renderer.SingleCpu => new LyapRendererCpu(),
-    Renderer.MultiCore => new LyapRendererMulticore<LyapRendererCpu>(256),
-    Renderer.Gpu => new LyapRendererOpenCl(),
-    _ => throw new ArgumentException("Unknown renderer type")
-};
-
-Console.WriteLine("fractalgpu benchmark");
-// var renderer = makeRenderer(Renderer.Gpu);
-// Render(renderer, "testN.bmp");
-
-if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-{
-    const string openClFrameworkPath = "/System/Library/Frameworks/OpenCL.framework";
-    var current = Environment.GetEnvironmentVariable("DYLD_LIBRARY_PATH");
-
-    if (string.IsNullOrEmpty(current))
+    var index = parseResult.GetValue(deviceOption) ?? DeviceRegistry.DefaultIndex();
+    try
     {
-        Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", openClFrameworkPath);
+        var device = DeviceRegistry.GetByIndex(index);
+        Console.WriteLine($"fractalgpu benchmark on [{device.Index}] {device.Name}");
+        Benchmark(device);
+        return 0;
     }
-    else if (!current.Split(':', StringSplitOptions.RemoveEmptyEntries)
-        .Any(segment => string.Equals(segment, openClFrameworkPath, StringComparison.Ordinal)))
+    catch (Exception ex)
     {
-        Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", $"{current}:{openClFrameworkPath}");
+        Console.Error.WriteLine($"Error: {ex.Message}");
+        return 1;
     }
-}
+});
 
-Console.WriteLine("Single-core tests\n=================");
-// Benchmark(Renderer.SingleCpu);
-Console.WriteLine("Multi-core tests\n=================");
-// Benchmark(Renderer.MultiCore);
-Console.WriteLine("GPU tests\n=================");
-Benchmark(Renderer.Gpu);
-
-public enum Renderer
+var listDevicesCommand = new Command("list-devices", "List all available render devices (CPU modes and OpenCL devices) with their indexes");
+listDevicesCommand.SetAction(_ =>
 {
-    SingleCpu,
-    MultiCore,
-    Gpu
-}
+    DeviceRegistry.PrintTable();
+    return 0;
+});
+
+var rootCommand = new RootCommand("FractalGPU RenderCli — Lyapunov fractal rendering and benchmarking");
+rootCommand.Subcommands.Add(benchmarkCommand);
+rootCommand.Subcommands.Add(listDevicesCommand);
+rootCommand.SetAction(_ =>
+{
+    rootCommand.Parse("--help").Invoke();
+    return 0;
+});
+
+return rootCommand.Parse(args).Invoke();

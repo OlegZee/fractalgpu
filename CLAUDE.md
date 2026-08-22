@@ -22,18 +22,38 @@ The rendering pipeline takes `Lyapunov.Settings` (fractal parameters) and produc
 
 ### Building and Running
 
+RenderCli is a multi-mode CLI built on System.CommandLine 2.0 (GA). Running it with no arguments shows help and exits 0; actual work happens through the `benchmark` and `list-devices` subcommands.
+
 ```bash
-# Build and run the CLI benchmark (recommended)
 cd src/RenderCli
-dotnet run -c Release
 
 # Build only
 dotnet build -c Release
+
+# Show help (default when no subcommand is given)
+dotnet run -c Release
+
+# List available render devices (CPU modes and OpenCL GPU devices), with indexes
+dotnet run -c Release -- list-devices
+
+# Run the escalating render benchmark on a specific device index
+dotnet run -c Release -- benchmark --device 0
+
+# Run the benchmark with no --device (defaults to the first GPU, else multi-core CPU)
+dotnet run -c Release -- benchmark
 ```
+
+Orientation for the CLI internals:
+- CLI parsing (`RootCommand`, `benchmark`/`list-devices` subcommands) lives in `Program.cs`.
+- Device selection — the unified list of CPU modes and OpenCL devices addressed by a single index — lives in `Fractal/DeviceRegistry.cs`.
+- Raw OpenCL platform/device enumeration lives in `Fractal/OpenClDevices.cs`.
+- The macOS OpenCL loader (see below) lives in `Fractal/OpenClLibraryResolver.cs`.
+
+Note: `src/FractalGpu.Benchmark` is a separate, unchanged benchmark tool for the shared rendering library; it is unrelated to RenderCli's device selection/CLI work described here.
 
 ### macOS OpenCL Setup
 
-OpenCL library loading is handled automatically using `NativeLibrary.SetDllImportResolver` in `LyapRendererOpenCl.cs`. The code detects macOS/Mac Catalyst and loads the system OpenCL framework without additional configuration.
+OpenCL library loading is handled automatically using `NativeLibrary.SetDllImportResolver`. In RenderCli, the resolver lives in `Fractal/OpenClLibraryResolver.cs` and is invoked from `OpenClDevices.Enumerate()`; it detects macOS/Mac Catalyst and loads the system OpenCL framework without requiring `DYLD_LIBRARY_PATH` or other environment configuration.
 
 ### Legacy Windows Forms App
 

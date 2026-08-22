@@ -8,18 +8,22 @@ namespace FractalGpu.RenderCli.Fractal
 	/// </summary>
 	internal class LyapRendererOpenCl : LyapRendererBase
 	{
-		public LyapRendererOpenCl()
+		private readonly ComputePlatform _platform;
+		private readonly ComputeDevice _device;
+
+		public LyapRendererOpenCl(int deviceIndex = 0)
 		{
-			var devices = (from p in Cloo.ComputePlatform.Platforms
-				from d in p.Devices
-				select (p, d)).ToArray();
+			var devices = OpenClDevices.Enumerate();
 			foreach (var (p, d) in devices)
 			{
 				Trace.WriteLine($"Platform: {p.Name}, device: {d.Name}");
 			}
-			Trace.WriteLine(devices.Length == 0 ? "NO DEVICES FOUND" : $"Devices list is OK");
-			if (devices.Length == 0) throw new Exception("GPU/OpenCL drivers not found");
+			Trace.WriteLine(devices.Count == 0 ? "NO DEVICES FOUND" : $"Devices list is OK");
+
+			(_platform, _device) = OpenClDevices.GetByIndex(deviceIndex);
 		}
+
+		public override string ToString() => $"{nameof(LyapRendererOpenCl)}[{_device.Name}]";
 		
 		public override float[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
 		{
@@ -31,8 +35,8 @@ namespace FractalGpu.RenderCli.Fractal
 
 			var mask = settings.Pattern.Select(c => c == 'a' ? 0 : 1).ToArray();
 
-			var platform = ComputePlatform.Platforms[0];
-			var device = platform.Devices[0];
+			var platform = _platform;
+			var device = _device;
 			Debug.WriteLine("Using platform {0}, device: {1}", platform.Name, device.Name);
 
 			var hsplit = 1;
@@ -48,7 +52,7 @@ namespace FractalGpu.RenderCli.Fractal
 			const ComputeMemoryFlags roBufferFlags = ComputeMemoryFlags.ReadOnly | ComputeMemoryFlags.UseHostPointer;
 
 			var properties = new ComputeContextPropertyList(platform);
-			using (var context = new ComputeContext(platform.Devices, properties, null, IntPtr.Zero))
+			using (var context = new ComputeContext(new List<ComputeDevice> { device }, properties, null, IntPtr.Zero))
 			using (var bData = new ComputeBuffer<float>(context, roBufferFlags, bValuesRaw))
 			using (var maskData = new ComputeBuffer<int>(context, roBufferFlags, mask))
 			using (var program = new ComputeProgram(context, Resources.Lyapunov))
