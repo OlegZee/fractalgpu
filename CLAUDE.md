@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 FractalGPU is a C# project for rendering Lyapunov fractals using multiple rendering backends (CPU, multi-core, GPU/OpenCL). The codebase consists of two main applications:
 
-- **RenderCli**: Command-line benchmarking tool (modern .NET 7.0)
+- **RenderCli**: Command-line benchmarking tool (modern .NET 10.0)
 - **FractalBrowser**: Windows Forms GUI application (legacy .NET Framework 3.5)
 
 ### Core Architecture

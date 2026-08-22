@@ -19,12 +19,12 @@ Extract core rendering logic into a separate module and create three new project
 2. **benchmark** - CLI app inheriting features of RenderCli project  
 3. **render-server** - ASP.NET Core application with fractal rendering API
 
-All projects should target .NET 9.0 and use the new SLNX solution file format.
+All projects should target .NET 10.0 and use the new SLNX solution file format.
 
 ## Why
 - **Separation of Concerns**: Core rendering logic becomes reusable across applications
 - **API Access**: Enable web-based fractal generation for external consumers
-- **Modern Architecture**: Leverage latest .NET 9.0 features and SLNX format
+- **Modern Architecture**: Leverage latest .NET 10.0 features and SLNX format
 - **Scalability**: Background queue processing prevents GPU overload
 
 ## What
@@ -39,7 +39,7 @@ All projects should target .NET 9.0 and use the new SLNX solution file format.
 - [ ] CLI benchmark app works identically to existing RenderCli
 - [ ] ASP.NET Core API accepts fractal parameters and returns bitmap images
 - [ ] Background queue manages GPU load with configurable parameters
-- [ ] All projects target .NET 9.0 with SLNX solution file
+- [ ] All projects target .NET 10.0 with SLNX solution file
 - [ ] FractalBrowser project remains untouched
 
 ## All Needed Context
@@ -48,7 +48,7 @@ All projects should target .NET 9.0 and use the new SLNX solution file format.
 ```yaml
 # MUST READ - Include these in your context window
 - url: https://devblogs.microsoft.com/dotnet/introducing-slnx-support-dotnet-cli/
-  why: Understanding new SLNX solution file format for .NET 9.0
+  why: Understanding new SLNX solution file format for .NET 10.0
   
 - url: https://learn.microsoft.com/en-us/dotnet/core/extensions/queue-service
   why: Background task queue patterns for GPU load management
@@ -56,7 +56,7 @@ All projects should target .NET 9.0 and use the new SLNX solution file format.
 - url: https://stackoverflow.com/questions/40794275/return-jpeg-image-from-asp-net-core-webapi
   why: Returning bitmap images from ASP.NET Core controllers
   
-- url: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-9.0
+- url: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-10.0
   why: Background services for task queue processing
   
 - file: src/RenderCli/Fractal/LyapRendererBase.cs
@@ -122,7 +122,7 @@ src/
 │   ├── appsettings.json     # Configuration
 │   └── FractalGpu.RenderServer.csproj
 ├── FractalBrowser/          # Existing - DO NOT TOUCH
-└── FractalGpu.slnx          # NEW - .NET 9.0 solution file
+└── FractalGpu.slnx          # NEW - .NET 10.0 solution file
 ```
 
 ### Known Gotchas of our codebase & Library Quirks
@@ -188,13 +188,13 @@ public class QueueSettings
 Task 1: Create SLNX solution file
 CREATE FractalGpu.slnx:
   - Use dotnet new sln --format slnx
-  - Target .NET 9.0 projects
+  - Target .NET 10.0 projects
   - Do NOT include FractalBrowser project
 
 Task 2: Create rendering library project
 CREATE src/FractalGpu.Rendering/:
   - COPY all files from src/RenderCli/Common/, Fractal/, Media/, Resources/
-  - MODIFY FractalGpu.Rendering.csproj targeting net9.0
+  - MODIFY FractalGpu.Rendering.csproj targeting net10.0
   - PRESERVE all existing renderer implementations
   - KEEP Cloo.clSharp dependency
 
@@ -209,7 +209,7 @@ Task 4: Create ASP.NET Core API project
 CREATE src/FractalGpu.RenderServer/:
   - Use dotnet new webapi template
   - ADD project reference to FractalGpu.Rendering
-  - TARGET net9.0 framework
+  - TARGET net10.0 framework
 
 Task 5: Implement FractalController
 CREATE src/FractalGpu.RenderServer/Controllers/FractalController.cs:
@@ -344,11 +344,11 @@ public class RenderBackgroundService : BackgroundService
 ```yaml
 DEPENDENCIES:
   - rendering: Cloo.clSharp v1.0.1 (OpenCL wrapper)
-  - server: Microsoft.AspNetCore.App (ASP.NET Core 9.0)
-  - benchmark: Console application targeting net9.0
+  - server: Microsoft.AspNetCore.App (ASP.NET Core 10.0)
+  - benchmark: Console application targeting net10.0
   
 SOLUTION:
-  - format: SLNX (new .NET 9.0 XML format)
+  - format: SLNX (new .NET 10.0 XML format)
   - command: "dotnet new sln --format slnx --name FractalGpu"
   
 CONFIG:
@@ -461,7 +461,7 @@ dotnet run
 - [ ] Queue status endpoint works: `curl .../status`
 - [ ] CLI benchmark matches original performance
 - [ ] SLNX solution file loads correctly
-- [ ] All projects target .NET 9.0
+- [ ] All projects target .NET 10.0
 - [ ] FractalBrowser project untouched
 
 ---
@@ -484,7 +484,7 @@ dotnet run
 This PRP provides comprehensive context for one-pass implementation success:
 - ✅ Complete codebase analysis with file-by-file breakdown
 - ✅ Real code examples from existing implementation  
-- ✅ Specific .NET 9.0 and SLNX format guidance with URLs
+- ✅ Specific .NET 10.0 and SLNX format guidance with URLs
 - ✅ Background service patterns with Channel-based queuing
 - ✅ ASP.NET Core File return patterns for bitmap responses
 - ✅ Detailed validation steps with executable commands

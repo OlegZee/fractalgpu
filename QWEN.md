@@ -1,7 +1,7 @@
 # FractalGpu Project
 
 ## Overview
-FractalGpu is a .NET 9.0 project focused on high-performance rendering of Lyapunov fractals using multiple computational approaches: CPU, multi-core CPU, and GPU (OpenCL). The project consists of several interconnected components designed for different use cases, including a core rendering library, a benchmarking tool, a web API server, and a GUI application.
+FractalGpu is a .NET 10.0 project focused on high-performance rendering of Lyapunov fractals using multiple computational approaches: CPU, multi-core CPU, and GPU (OpenCL). The project consists of several interconnected components designed for different use cases, including a core rendering library, a benchmarking tool, a web API server, and a GUI application.
 
 ## Project Structure
 The project is organized as a solution with multiple projects:
@@ -32,7 +32,7 @@ The project is organized as a solution with multiple projects:
 ## Building and Running
 
 ### Prerequisites
-- .NET SDK 9.0 or higher
+- .NET SDK 10.0 or higher
 - OpenCL drivers for GPU acceleration (if using OpenCL)
 
 ### Running Components
@@ -51,11 +51,11 @@ dotnet run
 #### GUI Application (macOS)
 ```bash
 cd src/FractalGpu.WinViewer
-dotnet run --framework net8.0-maccatalyst --configuration Debug
+dotnet run --framework net10.0-maccatalyst --configuration Debug
 ```
 
 Once built, you can double-click the .app bundle in Finder:
-- Navigate to: `bin/Debug/net8.0-maccatalyst/maccatalyst-arm64/`
+- Navigate to: `bin/Debug/net10.0-maccatalyst/maccatalyst-arm64/`
 - Double-click `FractalGpu.WinViewer.app`
 
 ## API Endpoints (RenderServer)
@@ -82,7 +82,7 @@ Example POST payload:
 ```
 
 ## Development Conventions
-- Uses .NET 9.0 with implicit usings and nullable reference types enabled
+- Uses .NET 10.0 with implicit usings and nullable reference types enabled
 - Implements object-oriented patterns with base classes and inheritance
 - Employs multi-threading techniques for performance optimization
 - Follows MVVM pattern in the GUI application
@@ -90,7 +90,7 @@ Example POST payload:
 - Uses channel-based queuing for web API job management
 
 ## Key Technologies
-- .NET 9.0
+- .NET 10.0
 - OpenCL via Cloo library for GPU acceleration
 - ASP.NET Core for web API
 - .NET MAUI for cross-platform GUI

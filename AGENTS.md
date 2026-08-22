@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 - `src/FractalGpu.Rendering/`: Source of truth for fractal logic (strategy pattern via `LyapRendererBase` with CPU, multicore, and OpenCL subclasses), plus common math helpers and embedded kernels.
-- `src/FractalGpu.Benchmark/`: .NET 9 console harness that stress-tests the renderers.
+- `src/FractalGpu.Benchmark/`: .NET 10 console harness that stress-tests the renderers.
 - `src/FractalGpu.RenderServer/`: ASP.NET Core queue-driven API; tune behavior through `appsettings*.json`.
 - `src/RenderCli/`: CLI wrapper around the rendering library—keep edits minimal and reuse shared types.
 - `src/FractalBrowser/`: Legacy WinForms browser targeting .NET Framework 3.5; **do not modify** unless the scope explicitly requires it.
@@ -10,7 +10,7 @@
 
 ## Build, Test, and Development Commands
 - `dotnet restore`: Restore NuGet dependencies for every project.
-- `dotnet build FractalGpu.sln`: Compile Rendering, Benchmark, RenderServer, and CLI projects together.
+- `dotnet build FractalGpu.slnx`: Compile Rendering, Benchmark, RenderServer, and CLI projects together.
 - `dotnet run -c Release --project src/FractalGpu.Benchmark/FractalGpu.Benchmark.csproj`: Execute the benchmark loop and log perf metrics per renderer.
 - `dotnet run --project src/FractalGpu.RenderServer/FractalGpu.RenderServer.csproj`: Launch the web API locally (`https://localhost:7043`); the `.http` file offers ready-made smoke calls.
 - macOS GPU runs are supported out of the box; the rendering library resolves the OpenCL framework automatically.
