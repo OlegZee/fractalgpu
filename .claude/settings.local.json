@@ -3,7 +3,6 @@
     "allow": [
       "mcp__archon__get_available_sources",
       "mcp__archon__perform_rag_query",
-      "mcp__serena__search_for_pattern",
       "Edit",
       "Read",
       "Write",
@@ -25,24 +24,16 @@
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:github.com)",
       "mcp__archon__list_projects",
-      "mcp__serena__list_dir",
-      "mcp__serena__get_symbols_overview",
-      "mcp__serena__find_symbol",
       "WebSearch",
       "Bash(cp:*)",
       "Bash(sed:*)",
       "Read(//System/Library/Frameworks/OpenCL.framework/**)",
-      "mcp__serena__find_file",
       "Read(//Users/olegz/.nuget/packages/cloo.clsharp/1.0.1/**)",
       "Bash(unzip:*)",
       "Read(//private/tmp/**)",
       "Bash(otool:*)",
-      "Bash(ilspycmd:*)",
-      "mcp__serena__insert_before_symbol"
+      "Bash(ilspycmd:*)"
     ]
   },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "serena"
-  ]
+  "enableAllProjectMcpServers": true
 }
