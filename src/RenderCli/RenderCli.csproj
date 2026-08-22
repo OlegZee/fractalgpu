@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Cloo.clSharp" Version="1.0.1" />
+    <PackageReference Include="System.CommandLine" Version="2.0.11" />
      <!-- <ProjectReference Include="/Users/olegz/projects-hobby/Cloo/Cloo/Cloo.csproj" /> -->
   </ItemGroup>
 
