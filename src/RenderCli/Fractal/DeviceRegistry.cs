@@ -1,4 +1,6 @@
-﻿namespace FractalGpu.RenderCli.Fractal
+﻿using FractalGpu.Rendering.Fractal;
+
+namespace FractalGpu.RenderCli.Fractal
 {
 	internal enum DeviceKind
 	{
@@ -28,17 +30,14 @@
 			openClError = null;
 			try
 			{
-				var oclDevices = OpenClDevices.Enumerate();
-				for (var i = 0; i < oclDevices.Count; i++)
+				var oclDevices = OpenClDevices.EnumerateInfo();
+				foreach (var info in oclDevices)
 				{
-					var oclIndex = i; // per-iteration local: the OpenCL-flat index, captured by the factory below
-					var (p, d) = oclDevices[oclIndex];
+					var details = $"({info.DeviceType})  platform: {info.PlatformName} {info.PlatformVersion}  CUs: {info.MaxComputeUnits}  mem: {info.GlobalMemoryBytes / (1024 * 1024)} MB  driver: {info.DriverVersion}";
+					if (!info.Available) details += "  [UNAVAILABLE]";
 
-					var details = $"({d.Type})  platform: {p.Name} {p.Version}  CUs: {d.MaxComputeUnits}  mem: {d.GlobalMemorySize / (1024 * 1024)} MB  driver: {d.DriverVersion}";
-					if (!d.Available) details += "  [UNAVAILABLE]";
-
-					devices.Add(new DeviceDescriptor(devices.Count, DeviceKind.OpenCl, d.Name, details,
-						() => new LyapRendererOpenCl(oclIndex)));
+					devices.Add(new DeviceDescriptor(devices.Count, DeviceKind.OpenCl, info.Name, details,
+						() => new LyapRendererOpenCl(info.Index)));
 				}
 			}
 			catch (Exception ex)

@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 
-using FractalGpu.RenderCli.Common;
+using FractalGpu.Rendering.Common;
+using FractalGpu.Rendering.Fractal;
 using FractalGpu.RenderCli.Fractal;
 
 void Render(LyapRendererBase renderer, string? fileName)

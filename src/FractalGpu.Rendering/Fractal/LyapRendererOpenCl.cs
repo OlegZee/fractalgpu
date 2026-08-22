@@ -4,91 +4,26 @@ using Cloo;
 namespace FractalGpu.Rendering.Fractal
 {
     /// <summary>
-    /// Helper to resolve OpenCL library path on macOS without requiring DYLD_LIBRARY_PATH.
-    /// </summary>
-    internal static class OpenClLibraryResolver
-    {
-        private static bool _isInitialized;
-        private static readonly object _lock = new();
-
-        public static void Initialize()
-        {
-            lock (_lock)
-            {
-                if (_isInitialized) return;
-
-                // Set up DllImport resolver for Cloo assembly
-                var clooAssembly = typeof(Cloo.ComputePlatform).Assembly;
-                System.Runtime.InteropServices.NativeLibrary.SetDllImportResolver(
-                    clooAssembly,
-                    DllImportResolver);
-
-                _isInitialized = true;
-                Trace.WriteLine("OpenCL library resolver initialized");
-            }
-        }
-
-        private static IntPtr DllImportResolver(string libraryName, System.Reflection.Assembly assembly, System.Runtime.InteropServices.DllImportSearchPath? searchPath)
-        {
-            // Only handle OpenCL library
-            if (!libraryName.Equals("OpenCL", StringComparison.OrdinalIgnoreCase))
-                return IntPtr.Zero;
-
-            IntPtr handle = IntPtr.Zero;
-
-            // Try macOS framework path first
-            if (OperatingSystem.IsMacOS() || OperatingSystem.IsMacCatalyst())
-            {
-                var macCandidates = new[]
-                {
-                    "/System/Library/Frameworks/OpenCL.framework/OpenCL",
-                    "/System/Library/Frameworks/OpenCL.framework/Versions/Current/OpenCL",
-                    "/System/Library/Frameworks/OpenCL.framework/Libraries/libOpenCL.dylib"
-                };
-
-                foreach (var frameworkPath in macCandidates)
-                {
-                    if (System.Runtime.InteropServices.NativeLibrary.TryLoad(frameworkPath, out handle))
-                    {
-                        Trace.WriteLine($"Loaded OpenCL from macOS framework: {frameworkPath}");
-                        return handle;
-                    }
-                }
-            }
-
-            // Fall back to default loading for other platforms (Windows, Linux)
-            // This will look for opencl.dll on Windows, libOpenCL.so on Linux
-            if (System.Runtime.InteropServices.NativeLibrary.TryLoad(libraryName, assembly, searchPath, out handle))
-            {
-                Trace.WriteLine($"Loaded OpenCL using default resolver");
-                return handle;
-            }
-
-            Trace.WriteLine($"Failed to load OpenCL library");
-            return IntPtr.Zero;
-        }
-    }
-
-    /// <summary>
     /// Fractal renderer implementation on OpenCL/Cloo.
     /// </summary>
     public class LyapRendererOpenCl : LyapRendererBase
     {
-        public LyapRendererOpenCl()
-        {
-            // Initialize OpenCL library resolver for macOS
-            OpenClLibraryResolver.Initialize();
+        private readonly ComputePlatform _platform;
+        private readonly ComputeDevice _device;
 
-            var devices = (from p in Cloo.ComputePlatform.Platforms
-                           from d in p.Devices
-                           select (p, d)).ToArray();
+        public LyapRendererOpenCl(int deviceIndex = 0)
+        {
+            var devices = OpenClDevices.Enumerate();
             foreach (var (p, d) in devices)
             {
                 Trace.WriteLine($"Platform: {p.Name}, device: {d.Name}");
             }
-            Trace.WriteLine(devices.Length == 0 ? "NO DEVICES FOUND" : $"Devices list is OK");
-            if (devices.Length == 0) throw new Exception("GPU/OpenCL drivers not found");
+            Trace.WriteLine(devices.Count == 0 ? "NO DEVICES FOUND" : $"Devices list is OK");
+
+            (_platform, _device) = OpenClDevices.GetByIndex(deviceIndex);
         }
+
+        public override string ToString() => $"{nameof(LyapRendererOpenCl)}[{_device.Name}]";
 
         public override float[,] RenderImpl(int w, int h, Lyapunov.Settings settings)
         {
@@ -100,8 +35,8 @@ namespace FractalGpu.Rendering.Fractal
 
             var mask = settings.Pattern.Select(c => c == 'a' ? 0 : 1).ToArray();
 
-            var platform = ComputePlatform.Platforms[0];
-            var device = platform.Devices[0];
+            var platform = _platform;
+            var device = _device;
             Debug.WriteLine("Using platform {0}, device: {1}", platform.Name, device.Name);
 
             var hsplit = 1;
@@ -117,7 +52,7 @@ namespace FractalGpu.Rendering.Fractal
             const ComputeMemoryFlags roBufferFlags = ComputeMemoryFlags.ReadOnly | ComputeMemoryFlags.UseHostPointer;
 
             var properties = new ComputeContextPropertyList(platform);
-            using (var context = new ComputeContext(platform.Devices, properties, null, IntPtr.Zero))
+            using (var context = new ComputeContext(new List<ComputeDevice> { device }, properties, null, IntPtr.Zero))
             using (var bData = new ComputeBuffer<float>(context, roBufferFlags, bValuesRaw))
             using (var maskData = new ComputeBuffer<int>(context, roBufferFlags, mask))
             using (var program = new ComputeProgram(context, Resources.Lyapunov))

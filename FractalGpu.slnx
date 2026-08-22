@@ -3,5 +3,6 @@
     <Project Path="src/FractalGpu.Rendering/FractalGpu.Rendering.csproj" />
     <Project Path="src/FractalGpu.Benchmark/FractalGpu.Benchmark.csproj" />
     <Project Path="src/FractalGpu.RenderServer/FractalGpu.RenderServer.csproj" />
+    <Project Path="src/RenderCli/RenderCli.csproj" />
   </Folder>
 </Solution>
