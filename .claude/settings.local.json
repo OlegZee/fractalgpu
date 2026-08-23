@@ -1,8 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "mcp__archon__get_available_sources",
-      "mcp__archon__perform_rag_query",
       "Edit",
       "Read",
       "Write",
@@ -23,7 +21,6 @@
       "Bash(cat:*)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:github.com)",
-      "mcp__archon__list_projects",
       "WebSearch",
       "Bash(cp:*)",
       "Bash(sed:*)",
@@ -34,6 +31,5 @@
       "Bash(otool:*)",
       "Bash(ilspycmd:*)"
     ]
-  },
-  "enableAllProjectMcpServers": true
+  }
 }
