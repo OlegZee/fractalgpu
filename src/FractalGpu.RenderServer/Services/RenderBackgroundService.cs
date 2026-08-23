@@ -1,7 +1,6 @@
 using FractalGpu.Rendering.Fractal;
 using FractalGpu.RenderServer.Models;
 using Microsoft.Extensions.Options;
-using System.Runtime.InteropServices;
 
 namespace FractalGpu.RenderServer.Services;
 
@@ -22,8 +21,9 @@ public class RenderBackgroundService : BackgroundService
         _logger = logger;
         _parallelismSemaphore = new SemaphoreSlim(_queueSettings.MaxParallelJobs, _queueSettings.MaxParallelJobs);
 
-        // Setup OpenCL environment for macOS if needed
-        SetupOpenClEnvironment();
+        DeviceRegistry.Enumerate(out var openClError);
+        if (openClError != null)
+            _logger.LogWarning("OpenCL enumeration failed: {Error} (CPU devices still available)", openClError);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -105,59 +105,9 @@ public class RenderBackgroundService : BackgroundService
 
     private LyapRendererBase CreateRenderer()
     {
-        try
-        {
-            // Try GPU first
-            return new LyapRendererOpenCl();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "GPU renderer failed to initialize, falling back to CPU");
-
-            try
-            {
-                // Try multicore CPU
-                return new LyapRendererMulticore<LyapRendererCpu>(Environment.ProcessorCount);
-            }
-            catch (Exception ex2)
-            {
-                _logger.LogWarning(ex2, "Multicore CPU renderer failed, using single-core CPU");
-
-                // Fallback to single-core CPU
-                return new LyapRendererCpu();
-            }
-        }
-    }
-
-    private void SetupOpenClEnvironment()
-    {
-        // Setup OpenCL environment for macOS
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || OperatingSystem.IsMacCatalyst())
-        {
-            const string openClFrameworkPath = "/System/Library/Frameworks/OpenCL.framework";
-            var current = Environment.GetEnvironmentVariable("DYLD_LIBRARY_PATH");
-
-            bool PathMissing()
-            {
-                if (string.IsNullOrEmpty(current))
-                {
-                    return true;
-                }
-
-                var segments = current.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                return !segments.Any(segment => string.Equals(segment, openClFrameworkPath, StringComparison.Ordinal));
-            }
-
-            if (PathMissing())
-            {
-                var updated = string.IsNullOrEmpty(current)
-                    ? openClFrameworkPath
-                    : $"{current}:{openClFrameworkPath}";
-
-                Environment.SetEnvironmentVariable("DYLD_LIBRARY_PATH", updated);
-                _logger.LogInformation("Ensured DYLD_LIBRARY_PATH includes OpenCL framework for macOS");
-            }
-        }
+        var device = DeviceRegistry.GetByIndex(DeviceRegistry.DefaultIndex());
+        _logger.LogInformation("Rendering on device [{Index}] {Name}", device.Index, device.Name);
+        return device.CreateRenderer();
     }
 
     public override void Dispose()

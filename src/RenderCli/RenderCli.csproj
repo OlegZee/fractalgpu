@@ -9,12 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cloo.clSharp" Version="1.0.1" />
-     <!-- <ProjectReference Include="/Users/olegz/projects-hobby/Cloo/Cloo/Cloo.csproj" /> -->
+    <PackageReference Include="System.CommandLine" Version="2.0.11" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources/*.*" />
+    <ProjectReference Include="../FractalGpu.Rendering/FractalGpu.Rendering.csproj" />
   </ItemGroup>
 
 </Project>
