@@ -63,5 +63,7 @@ namespace FractalGpu.Rendering.Fractal
 
             return result;
         }
+
+        public override string ToString() => $"LyapRendererMulticore<{typeof(TBaseRenderer).Name}>[{_splitTilesCount} tiles]";
     }
 }
