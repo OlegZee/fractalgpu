@@ -2,7 +2,6 @@
 
 using FractalGpu.Rendering.Common;
 using FractalGpu.Rendering.Fractal;
-using FractalGpu.RenderCli.Fractal;
 
 void Render(LyapRendererBase renderer, string? fileName)
 {
@@ -83,6 +82,21 @@ void Benchmark(DeviceDescriptor device)
     } while (execTime.TotalSeconds < 2.5 && stepIndex < steps.Length);
 }
 
+void PrintDeviceTable()
+{
+    var devices = DeviceRegistry.Enumerate(out var openClError);
+
+    foreach (var device in devices)
+    {
+        var line = $"[{device.Index}] {device.Name}";
+        if (!string.IsNullOrEmpty(device.Details)) line += "  " + device.Details;
+        Console.WriteLine(line);
+    }
+
+    if (openClError != null)
+        Console.WriteLine($"OpenCL enumeration failed: {openClError} (CPU devices still available)");
+}
+
 var deviceOption = new Option<int?>("--device", "-d")
     { Description = "Device index from 'list-devices' (default: first GPU, else multi-core CPU)" };
 
@@ -91,9 +105,17 @@ benchmarkCommand.Options.Add(deviceOption);
 benchmarkCommand.SetAction(parseResult =>
 {
     var index = parseResult.GetValue(deviceOption) ?? DeviceRegistry.DefaultIndex();
+
+    DeviceDescriptor device;
+    try { device = DeviceRegistry.GetByIndex(index); }
+    catch (ArgumentException ex)
+    {
+        Console.Error.WriteLine($"Error: {ex.Message} Run 'list-devices' to see available devices.");
+        return 1;
+    }
+
     try
     {
-        var device = DeviceRegistry.GetByIndex(index);
         Console.WriteLine($"fractalgpu benchmark on [{device.Index}] {device.Name}");
         Benchmark(device);
         return 0;
@@ -108,7 +130,7 @@ benchmarkCommand.SetAction(parseResult =>
 var listDevicesCommand = new Command("list-devices", "List all available render devices (CPU modes and OpenCL devices) with their indexes");
 listDevicesCommand.SetAction(_ =>
 {
-    DeviceRegistry.PrintTable();
+    PrintDeviceTable();
     return 0;
 });
 
