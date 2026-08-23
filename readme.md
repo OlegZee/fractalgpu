@@ -39,10 +39,17 @@ Run on the first GPU:
 dotnet run -c Release --project src/RenderCli -- benchmark --device 2
 ```
 
-Run with no `--device` (defaults to the first GPU, or multi-core CPU if none is available):
+Run with no `--device` (benchmarks ALL available devices sequentially and prints a comparison summary):
 
 ```bash
 dotnet run -c Release --project src/RenderCli -- benchmark
+```
+
+Compare several devices in one run (both forms are equivalent):
+
+```bash
+dotnet run -c Release --project src/RenderCli -- benchmark -d 0 -d 2
+dotnet run -c Release --project src/RenderCli -- benchmark -d 0 2
 ```
 
 ## Running under macOS

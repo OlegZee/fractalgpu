@@ -20,8 +20,8 @@ dotnet build FractalGpu.slnx -c Release
 
 # CLI: no arguments = help; work happens in subcommands
 dotnet run -c Release --project src/RenderCli -- list-devices
-dotnet run -c Release --project src/RenderCli -- benchmark --device 0   # index from list-devices
-dotnet run -c Release --project src/RenderCli -- benchmark              # default: first GPU, else multi-core CPU
+dotnet run -c Release --project src/RenderCli -- benchmark --device 0   # index from list-devices; repeatable (-d 0 2) to compare devices
+dotnet run -c Release --project src/RenderCli -- benchmark              # no --device: benchmarks all devices, prints comparison summary
 
 # Render server (http://localhost:5229, see Properties/launchSettings.json)
 dotnet run --project src/FractalGpu.RenderServer
