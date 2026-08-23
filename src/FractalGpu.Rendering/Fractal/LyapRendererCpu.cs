@@ -109,5 +109,7 @@
 
             return total / Math.Log(2) / (iterations - warmup);
         }
+
+        public override string ToString() => nameof(LyapRendererCpu);
     }
 }
