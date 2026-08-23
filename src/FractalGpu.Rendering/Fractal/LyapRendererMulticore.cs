@@ -37,7 +37,7 @@ namespace FractalGpu.Rendering.Fractal
 
                 var bPerTile = (settings.A.End - settings.A.Start) / _splitTilesCount;
                 var a = settings.A.Start + tileIndex * bPerTile;
-                var tileSettings = settings.SetA(new Range<double>(a, a + bPerTile));
+                var tileSettings = settings with { A = new Range<double>(a, a + bPerTile) };
 
                 handles[tileIndex] = new AutoResetEvent(false);
 

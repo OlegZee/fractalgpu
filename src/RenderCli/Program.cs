@@ -8,15 +8,17 @@ void Render(LyapRendererBase renderer, string? fileName)
     var picSize = 256;
     var iterations = 10000;
 
-    var settings = new Lyapunov.Settings()
-        .SetA(new Range<double>(2, 4))
-        .SetB(new Range<double>(2, 4))
-        .SetPattern("ab")
-        .SetInitial(0.5)
-        .SetIterations(iterations/10, iterations)
-
-        .SetSize(new Sz(picSize, picSize))
-        .SetContrast(1.7);
+    var settings = new Lyapunov.Settings
+    {
+        A = new Range<double>(2, 4),
+        B = new Range<double>(2, 4),
+        Pattern = "ab",
+        InitialValue = 0.5,
+        Warmup = iterations / 10,
+        Iterations = iterations,
+        Size = new Sz(picSize, picSize),
+        Contrast = 1.7,
+    };
 
     var startTime = DateTime.Now;
     var bmp = renderer.Render(settings);
@@ -37,12 +39,14 @@ void Benchmark(DeviceDescriptor device)
     var picSize = 256;
     var numIterations = 1000;
     
-    var settings = new Lyapunov.Settings()
-        .SetA(new Range<double>(2, 4))
-        .SetB(new Range<double>(2, 4))
-        .SetPattern("ab")
-        .SetInitial(0.5)
-        .SetContrast(1.7);
+    var settings = new Lyapunov.Settings
+    {
+        A = new Range<double>(2, 4),
+        B = new Range<double>(2, 4),
+        Pattern = "ab",
+        InitialValue = 0.5,
+        Contrast = 1.7,
+    };
 
     var steps = new[]
     {
@@ -64,9 +68,7 @@ void Benchmark(DeviceDescriptor device)
     do
     {
         steps[stepIndex]();
-        settings = settings
-            .SetIterations(numIterations / 10, numIterations)
-            .SetSize(new Sz(picSize, picSize));
+        settings = settings with { Warmup = numIterations / 10, Iterations = numIterations, Size = new Sz(picSize, picSize) };
 
         var startTime = DateTime.Now;
         var bmp = renderer.Render(settings);

@@ -42,14 +42,17 @@ public class FractalController : ControllerBase
                 request.Width, request.Height, request.Pattern);
 
             // Convert API model to rendering settings
-            var settings = new Lyapunov.Settings()
-                .SetA(request.StartA, request.EndA)
-                .SetB(request.StartB, request.EndB)
-                .SetPattern(request.Pattern)
-                .SetInitial(request.Initial)
-                .SetIterations(request.Warmup, request.Iterations)
-                .SetSize(new Sz(request.Width, request.Height))
-                .SetContrast(request.Contrast);
+            var settings = new Lyapunov.Settings
+            {
+                A = new Range<double>(request.StartA, request.EndA),
+                B = new Range<double>(request.StartB, request.EndB),
+                Pattern = request.Pattern,
+                InitialValue = request.Initial,
+                Warmup = request.Warmup,
+                Iterations = request.Iterations,
+                Size = new Sz(request.Width, request.Height),
+                Contrast = request.Contrast,
+            };
 
             // Queue the render job
             var result = await _renderQueue.QueueRenderAsync(settings, cancellationToken);
