@@ -44,8 +44,8 @@ dotnet run -c Release -- benchmark
 ```
 
 Orientation for the CLI internals:
-- CLI parsing (`RootCommand`, `benchmark`/`list-devices` subcommands) lives in `src/RenderCli/Program.cs`, built on System.CommandLine 2.0 (GA).
-- Device selection — the unified list of CPU modes and OpenCL devices addressed by a single index — lives in `src/RenderCli/Fractal/DeviceRegistry.cs`. It consumes the shared `FractalGpu.Rendering` library and never references Cloo directly.
+- CLI parsing (`RootCommand`, `benchmark`/`list-devices` subcommands) lives in `src/RenderCli/Program.cs`, built on System.CommandLine 2.0 (GA). RenderCli is otherwise just that one file plus the csproj — no local `Fractal/` code.
+- Device selection — the unified list of CPU modes and OpenCL devices addressed by a single index — lives in `src/FractalGpu.Rendering/Fractal/DeviceRegistry.cs`, shared by both RenderCli and FractalGpu.RenderServer. It never references Cloo directly.
 - Raw OpenCL platform/device enumeration (and the public, Cloo-free `OpenClDeviceInfo` DTO) lives in `src/FractalGpu.Rendering/Fractal/OpenClDevices.cs`.
 - The macOS OpenCL loader (see below) lives in `src/FractalGpu.Rendering/Fractal/OpenClLibraryResolver.cs`.
 
@@ -70,13 +70,12 @@ The FractalBrowser project uses the older MSBuild format and targets .NET Framew
 src/
 ├── FractalGpu.Rendering/  # Shared rendering library (CPU, multi-core, GPU/OpenCL)
 │   ├── Common/            # Shared utilities (Range, Sz)
-│   ├── Fractal/           # Renderer implementations, OpenClDevices, OpenClLibraryResolver
+│   ├── Fractal/           # Renderer implementations, DeviceRegistry, OpenClDevices, OpenClLibraryResolver
 │   ├── Media/             # Bitmap handling
 │   └── Resources/         # Embedded OpenCL kernels
 ├── RenderCli/             # Multi-mode CLI (benchmark / list-devices)
-│   ├── Program.cs         # CLI parsing (System.CommandLine 2.0 GA)
-│   └── Fractal/           # DeviceRegistry.cs (unifies CPU modes + OpenCL devices)
-├── FractalGpu.RenderServer/ # ASP.NET render service
+│   └── Program.cs         # CLI parsing (System.CommandLine 2.0 GA); only file besides the csproj
+├── FractalGpu.RenderServer/ # ASP.NET render service (also uses DeviceRegistry to pick a renderer)
 └── FractalBrowser/        # Legacy GUI app
     ├── Common/            # Shared utilities (duplicated)
     ├── Fractal/           # Renderer implementations (duplicated)
