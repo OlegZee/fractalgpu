@@ -8,12 +8,12 @@ Prerequisites:
 - Dotnet SDK 10.0+
 
 ```bash
-dotnet run -c Release -p src/FractalGpu.Benchmark
+dotnet run -c Release --project src/RenderCli -- benchmark
 ```
 
 ## RenderCli (multi-mode CLI)
 
-`RenderCli` is a separate, multi-mode command-line tool — distinct from `FractalGpu.Benchmark` above. It lets you list available render devices (CPU modes and OpenCL GPU devices) and run the escalating render benchmark against a specific one.
+`RenderCli` is a multi-mode command-line tool. It lets you list available render devices (CPU modes and OpenCL GPU devices) and run the escalating render benchmark against a specific one.
 
 List available devices:
 

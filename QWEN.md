@@ -7,7 +7,7 @@ FractalGpu is a .NET 10.0 project focused on high-performance rendering of Lyapu
 The project is organized as a solution with multiple projects:
 
 - `FractalGpu.Rendering`: Core rendering library with CPU, multi-core and GPU implementations
-- `FractalGpu.Benchmark`: Console application for performance testing
+- `RenderCli`: Multi-mode CLI for benchmarking and device listing (`benchmark`/`list-devices` subcommands)
 - `FractalGpu.RenderServer`: ASP.NET Core web API for distributed rendering
 - `FractalGpu.WinViewer`: .NET MAUI GUI application for interactive fractal exploration
 
@@ -37,9 +37,9 @@ The project is organized as a solution with multiple projects:
 
 ### Running Components
 
-#### Benchmark
+#### Benchmark (RenderCli)
 ```bash
-dotnet run -c Release -p src/FractalGpu.Benchmark
+dotnet run -c Release --project src/RenderCli -- benchmark
 ```
 
 #### Web API Server
