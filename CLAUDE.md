@@ -49,11 +49,9 @@ Orientation for the CLI internals:
 - Raw OpenCL platform/device enumeration (and the public, Cloo-free `OpenClDeviceInfo` DTO) lives in `src/FractalGpu.Rendering/Fractal/OpenClDevices.cs`.
 - The macOS OpenCL loader (see below) lives in `src/FractalGpu.Rendering/Fractal/OpenClLibraryResolver.cs`.
 
-Note: `src/FractalGpu.Benchmark` is a separate, unchanged benchmark tool for the shared rendering library; it is unrelated to RenderCli's device selection/CLI work described here.
-
 ### macOS OpenCL Setup
 
-OpenCL library loading is handled automatically using `NativeLibrary.SetDllImportResolver`. The resolver lives in `FractalGpu.Rendering/Fractal/OpenClLibraryResolver.cs` and is invoked from `OpenClDevices.Enumerate()`/`EnumerateInfo()`; it detects macOS/Mac Catalyst and loads the system OpenCL framework without requiring `DYLD_LIBRARY_PATH` or other environment configuration. Because it lives in the shared `FractalGpu.Rendering` library, every consumer (RenderCli, FractalGpu.Benchmark, FractalGpu.RenderServer) gets it automatically — there is nothing to configure per-project.
+OpenCL library loading is handled automatically using `NativeLibrary.SetDllImportResolver`. The resolver lives in `FractalGpu.Rendering/Fractal/OpenClLibraryResolver.cs` and is invoked from `OpenClDevices.Enumerate()`/`EnumerateInfo()`; it detects macOS/Mac Catalyst and loads the system OpenCL framework without requiring `DYLD_LIBRARY_PATH` or other environment configuration. Because it lives in the shared `FractalGpu.Rendering` library, every consumer (RenderCli, FractalGpu.RenderServer) gets it automatically — there is nothing to configure per-project.
 
 ### Legacy Windows Forms App
 
@@ -63,7 +61,7 @@ The FractalBrowser project uses the older MSBuild format and targets .NET Framew
 
 - **RenderCli**: References `FractalGpu.Rendering` (project reference) for all fractal rendering and OpenCL code; no direct Cloo dependency. RenderCli must never reference Cloo types directly — `FractalGpu.Rendering.Fractal.OpenClDevices.EnumerateInfo()` exposes a Cloo-free DTO (`OpenClDeviceInfo`) for device enumeration.
 - **FractalBrowser**: References legacy Cloo NuGet package and Microsoft Accelerator
-- **FractalGpu.Benchmark** / **FractalGpu.RenderServer**: Also reference `FractalGpu.Rendering` (project reference)
+- **FractalGpu.RenderServer**: Also references `FractalGpu.Rendering` (project reference)
 - FractalBrowser still carries its own duplicated copy of the fractal rendering code (legacy .NET Framework 3.5, can't reference the modern `FractalGpu.Rendering` library)
 
 ## Code Organization
@@ -78,7 +76,6 @@ src/
 ├── RenderCli/             # Multi-mode CLI (benchmark / list-devices)
 │   ├── Program.cs         # CLI parsing (System.CommandLine 2.0 GA)
 │   └── Fractal/           # DeviceRegistry.cs (unifies CPU modes + OpenCL devices)
-├── FractalGpu.Benchmark/  # Separate, unchanged benchmark tool for the shared library
 ├── FractalGpu.RenderServer/ # ASP.NET render service
 └── FractalBrowser/        # Legacy GUI app
     ├── Common/            # Shared utilities (duplicated)
@@ -86,7 +83,7 @@ src/
     └── View/              # Windows Forms UI
 ```
 
-The codebase's remaining code duplication for fractal rendering is scoped to the legacy `FractalBrowser` project (stuck on .NET Framework 3.5, so it cannot reference `FractalGpu.Rendering`). RenderCli, FractalGpu.Benchmark, and FractalGpu.RenderServer all share the same `FractalGpu.Rendering` library with no duplication between them.
+The codebase's remaining code duplication for fractal rendering is scoped to the legacy `FractalBrowser` project (stuck on .NET Framework 3.5, so it cannot reference `FractalGpu.Rendering`). RenderCli and FractalGpu.RenderServer both share the same `FractalGpu.Rendering` library with no duplication between them.
 
 # CRITICAL: ARCHON-FIRST RULE - READ THIS FIRST
   BEFORE doing ANYTHING else, when you see ANY task management scenario:
