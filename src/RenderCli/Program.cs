@@ -33,12 +33,12 @@ void Render(LyapRendererBase renderer, string? fileName)
     if(!string.IsNullOrEmpty(fileName)) bmp.Save(fileName);
 }
 
-void Benchmark(DeviceDescriptor device)
+BenchResult Benchmark(DeviceDescriptor device)
 {
     var renderer = device.CreateRenderer();
     var picSize = 256;
     var numIterations = 1000;
-    
+
     var settings = new Lyapunov.Settings
     {
         A = new Range<double>(2, 4),
@@ -50,19 +50,24 @@ void Benchmark(DeviceDescriptor device)
 
     var steps = new[]
     {
-        () => { picSize = 256; numIterations = 1000; }, 
+        () => { picSize = 256; numIterations = 1000; },
         () => { picSize = 512; },
-        () => { picSize = 1024; }, 
-        () => { numIterations = 2500; }, 
-        () => { numIterations = 5000; }, 
-        () => { numIterations = 10000; }, 
-        () => { numIterations = 25000; }, 
-        () => { numIterations = 50000; }, 
-        () => { picSize = 1536; }, 
-        () => { picSize = 2048; }, 
-        () => { picSize = 4096; }, 
+        () => { picSize = 1024; },
+        () => { numIterations = 2500; },
+        () => { numIterations = 5000; },
+        () => { numIterations = 10000; },
+        () => { numIterations = 25000; },
+        () => { numIterations = 50000; },
+        () => { picSize = 1536; },
+        () => { picSize = 2048; },
+        () => { picSize = 4096; },
     };
-    
+
+    var peakMis = 0.0;
+    var peakSize = new Sz(0, 0);
+    var peakIterations = 0;
+    var totalTime = TimeSpan.Zero;
+
     TimeSpan execTime;
     var stepIndex = 0;
     do
@@ -80,8 +85,14 @@ void Benchmark(DeviceDescriptor device)
         Console.WriteLine(string.Format("Rendering time: {0:#0.000}s {6:#0.##}mis '{1}' N{2} {3}x{4} @{5}",
             execTime.TotalSeconds, settings.Pattern, settings.Iterations,
             settings.Size.Width, settings.Size.Height, renderer, perf));
+
+        totalTime += execTime;
+        if (perf > peakMis) { peakMis = perf; peakSize = settings.Size; peakIterations = settings.Iterations; }
+
         stepIndex++;
     } while (execTime.TotalSeconds < 2.5 && stepIndex < steps.Length);
+
+    return new BenchResult(device, peakMis, peakSize, peakIterations, totalTime);
 }
 
 void PrintDeviceTable()
@@ -99,34 +110,67 @@ void PrintDeviceTable()
         Console.WriteLine($"OpenCL enumeration failed: {openClError} (CPU devices still available)");
 }
 
-var deviceOption = new Option<int?>("--device", "-d")
-    { Description = "Device index from 'list-devices' (default: first GPU, else multi-core CPU)" };
+var deviceOption = new Option<int[]>("--device", "-d")
+{
+    Description = "Device index from 'list-devices'; repeatable (-d 0 -d 2) or space-separated (-d 0 2). Default: all devices",
+    AllowMultipleArgumentsPerToken = true,
+};
 
 var benchmarkCommand = new Command("benchmark", "Run the escalating render benchmark on a selected device");
 benchmarkCommand.Options.Add(deviceOption);
 benchmarkCommand.SetAction(parseResult =>
 {
-    var index = parseResult.GetValue(deviceOption) ?? DeviceRegistry.DefaultIndex();
+    var requested = parseResult.GetValue(deviceOption) ?? [];
 
-    DeviceDescriptor device;
-    try { device = DeviceRegistry.GetByIndex(index); }
-    catch (ArgumentException ex)
+    List<DeviceDescriptor> devices;
+    if (requested.Length == 0)
     {
-        Console.Error.WriteLine($"Error: {ex.Message} Run 'list-devices' to see available devices.");
-        return 1;
+        devices = DeviceRegistry.Enumerate(out var openClError).ToList();
+        if (openClError != null)
+            Console.WriteLine($"OpenCL enumeration failed: {openClError} (CPU devices still available)");
+    }
+    else
+    {
+        devices = [];
+        foreach (var index in requested.Distinct())
+        {
+            try { devices.Add(DeviceRegistry.GetByIndex(index)); }
+            catch (ArgumentException ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message} Run 'list-devices' to see available devices.");
+                return 1;
+            }
+        }
     }
 
-    try
+    var results = new List<BenchResult>();
+    var anyFailed = false;
+    foreach (var device in devices)
     {
         Console.WriteLine($"fractalgpu benchmark on [{device.Index}] {device.Name}");
-        Benchmark(device);
-        return 0;
+        if (!string.IsNullOrEmpty(device.Details)) Console.WriteLine($"  {device.Details}");
+        try
+        {
+            var result = Benchmark(device);
+            Console.WriteLine($"Best: {result.PeakMis:#0.##}mis at {result.PeakSize.Width}x{result.PeakSize.Height} N{result.PeakIterations} (total {result.TotalTime.TotalSeconds:#0.0}s)");
+            results.Add(result);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+            anyFailed = true;
+        }
+        Console.WriteLine();
     }
-    catch (Exception ex)
+
+    if (results.Count > 1)
     {
-        Console.Error.WriteLine($"Error: {ex.Message}");
-        return 1;
+        Console.WriteLine("Summary (peak throughput):");
+        foreach (var r in results)
+            Console.WriteLine($"  [{r.Device.Index}] {r.Device.Name}: {r.PeakMis:#0.##}mis ({r.PeakSize.Width}x{r.PeakSize.Height} N{r.PeakIterations})");
     }
+
+    return anyFailed ? 1 : 0;
 });
 
 var listDevicesCommand = new Command("list-devices", "List all available render devices (CPU modes and OpenCL devices) with their indexes");
@@ -146,3 +190,5 @@ rootCommand.SetAction(_ =>
 });
 
 return rootCommand.Parse(args).Invoke();
+
+internal sealed record BenchResult(DeviceDescriptor Device, double PeakMis, Sz PeakSize, int PeakIterations, TimeSpan TotalTime);
