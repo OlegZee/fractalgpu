@@ -46,7 +46,11 @@ Run on the first GPU:
 dotnet run -c Release --project src/RenderCli -- benchmark --device 4
 ```
 
-Device indices: `0` single-core CPU, `1` multi-core CPU, `2` single-core perf, `3` multi-core perf, `4+` OpenCL devices. Use `list-devices` for the authoritative list on your machine.
+Device indices: `0` single-core CPU, `1` multi-core CPU, `2` single-core perf, `3` multi-core perf, `4+` OpenCL devices, followed by their `(perf)` variants (one per OpenCL device, e.g. `5` on a single-GPU machine). Use `list-devices` for the authoritative list on your machine.
+
+### Optimized GPU rendering
+
+Each OpenCL device also appears as a `(perf)` entry (`LyapRendererOpenClPerf`), a performance-tuned GPU path that is ~2.3x faster than the regular GPU device (~750k vs ~325k mis on an Apple M5 Pro). It keeps the pattern as a bitmask in registers instead of a per-iteration global-memory load + modulo, takes one `native_log2` per 4 iterations (logging the product of |dF|) with ln2 folded into the output scale, specializes the pattern at kernel-compile time (`-D PAT_BITS/PAT_LEN/PHASE0`, falling back to a runtime bitmask for patterns longer than 32), caches the compiled program/context across renders, and builds with `-cl-fast-relaxed-math -cl-mad-enable`. The fast-math flag is the caveat: FMA contraction and reassociation perturb low bits of the chaotic recurrence, so ~6% of output bytes differ from the regular GPU device (statistically equivalent image, deterministic run-to-run on the same device, but not pixel-reproducible against the reference). Use the regular GPU device when pixel-exact output matters.
 
 ### Rendering to a file
 

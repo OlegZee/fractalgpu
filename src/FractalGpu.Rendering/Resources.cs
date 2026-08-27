@@ -3,6 +3,7 @@ namespace FractalGpu.Rendering;
 public static class Resources
 {
     public static string Lyapunov => GetResourceString("Lyapunov.c");
+    public static string LyapunovPerf => GetResourceString("LyapunovPerf.c");
     // public static string LyapunovNonoptimized => GetResourceString("LyapunovNonoptimized.c");
 
     private static string GetResourceString(string name)

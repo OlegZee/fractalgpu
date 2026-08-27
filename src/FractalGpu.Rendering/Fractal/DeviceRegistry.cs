@@ -6,7 +6,8 @@
         MultiCore,
         CpuPerf,
         MultiCorePerf,
-        OpenCl
+        OpenCl,
+        OpenClPerf
     }
 
     public sealed record DeviceDescriptor(int Index, DeviceKind Kind, string Name, string Details, Func<LyapRendererBase> CreateRenderer);
@@ -46,6 +47,17 @@
 
                     devices.Add(new DeviceDescriptor(devices.Count, DeviceKind.OpenCl, info.Name, details,
                         () => new LyapRendererOpenCl(info.Index)));
+                }
+
+                // perf variants come after all regular OpenCL devices so existing indices stay stable
+                foreach (var info in oclDevices)
+                {
+                    var details = $"({info.DeviceType})  platform: {info.PlatformName} {info.PlatformVersion}  CUs: {info.MaxComputeUnits}  mem: {info.GlobalMemoryBytes / (1024 * 1024)} MB  driver: {info.DriverVersion}";
+                    if (!info.Available) details += "  [UNAVAILABLE]";
+                    details += "  fast-relaxed-math: output statistically equivalent, not pixel-reproducible";
+
+                    devices.Add(new DeviceDescriptor(devices.Count, DeviceKind.OpenClPerf, $"{info.Name} (perf)", details,
+                        () => new LyapRendererOpenClPerf(info.Index)));
                 }
             }
             catch (Exception ex)
