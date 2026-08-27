@@ -15,7 +15,7 @@ namespace FractalGpu.Rendering.Fractal
     /// a non-finite value are flagged during renormalization and recomputed with the scalar
     /// code, which also handles row tails and non-accelerated hardware.
     /// </summary>
-    public class LyapRendererSimd : LyapRendererCpu
+    public class LyapRendererCpuOptimized : LyapRendererCpu
     {
         private const int GroupSize = 10;
         private const ulong MantissaMask = 0x000F_FFFF_FFFF_FFFF;
@@ -348,6 +348,6 @@ namespace FractalGpu.Rendering.Fractal
                 new BlockResult(p2, e2, bad2), new BlockResult(p3, e3, bad3), groups);
         }
 
-        public override string ToString() => $"{nameof(LyapRendererSimd)}[{Vector<double>.Count} lanes, deferred log]";
+        public override string ToString() => $"{nameof(LyapRendererCpuOptimized)}[{Vector<double>.Count} lanes, deferred log]";
     }
 }
