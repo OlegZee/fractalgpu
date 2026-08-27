@@ -33,11 +33,24 @@ Run on all CPU cores:
 dotnet run -c Release --project src/RenderCli -- benchmark --device 1
 ```
 
-Run on the first GPU:
+Run the SIMD-vectorized CPU variants (single-core and multi-core):
 
 ```bash
 dotnet run -c Release --project src/RenderCli -- benchmark --device 2
+dotnet run -c Release --project src/RenderCli -- benchmark --device 3
 ```
+
+Run on the first GPU:
+
+```bash
+dotnet run -c Release --project src/RenderCli -- benchmark --device 4
+```
+
+Device indices: `0` single-core CPU, `1` multi-core CPU, `2` single-core SIMD, `3` multi-core SIMD, `4+` OpenCL devices. Use `list-devices` for the authoritative list on your machine.
+
+### SIMD rendering
+
+`LyapRendererSimd` vectorizes the Lyapunov inner loop with variable-width `System.Numerics.Vector<double>` and the built-in `Vector.Log` (.NET 9+): the same code path runs 128-bit NEON on ARM64 (Apple Silicon), 256-bit AVX2 on x64, and falls back to the scalar renderer where hardware acceleration is unavailable. On AVX-512 machines set `DOTNET_MaxVectorTBitWidth=512` to unlock 512-bit vectors. Output matches the scalar renderer at float precision.
 
 Run with no `--device` (benchmarks ALL available devices sequentially and prints a comparison summary):
 
