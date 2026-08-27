@@ -13,7 +13,7 @@ dotnet run -c Release --project src/RenderCli -- benchmark
 
 ## RenderCli (multi-mode CLI)
 
-`RenderCli` is a multi-mode command-line tool. It lets you list available render devices (CPU modes and OpenCL GPU devices) and run the escalating render benchmark against a specific one.
+`RenderCli` is a multi-mode command-line tool. It lets you list available render devices (CPU modes and OpenCL GPU devices), run the escalating render benchmark against a specific one, and render a fractal image to a BMP file.
 
 List available devices:
 
@@ -47,6 +47,17 @@ dotnet run -c Release --project src/RenderCli -- benchmark --device 4
 ```
 
 Device indices: `0` single-core CPU, `1` multi-core CPU, `2` single-core SIMD, `3` multi-core SIMD, `4+` OpenCL devices. Use `list-devices` for the authoritative list on your machine.
+
+### Rendering to a file
+
+Render a Lyapunov fractal to a BMP file (defaults: preferred device, `fractal.bmp`, 512x512, 10000 iterations, pattern `ab`):
+
+```bash
+dotnet run -c Release --project src/RenderCli -- render
+dotnet run -c Release --project src/RenderCli -- render -d 0 -o scalar.bmp --size 256 --iterations 2000
+```
+
+Options: `--device`/`-d` device index, `--output`/`-o` output path, `--size` square image size, `--iterations` per-pixel iterations (warmup is iterations/10), `--pattern` Lyapunov sequence. Rendering the same image on device `0` (scalar CPU) and device `2` (SIMD) and comparing the files (`cmp a.bmp b.bmp`) is the quick correctness check for the SIMD renderer — the outputs are byte-identical.
 
 ### SIMD rendering
 

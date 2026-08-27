@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 FractalGPU renders Lyapunov fractals on multiple backends (single-core CPU, multi-core CPU, GPU via OpenCL/Cloo). Requires .NET SDK 10.0 (pinned in `global.json`). The solution `FractalGpu.slnx` contains three projects:
 
 - **FractalGpu.Rendering** — shared library; the source of truth for all fractal logic, device selection, and OpenCL interop
-- **RenderCli** — multi-mode CLI (`benchmark` / `list-devices` subcommands); a single `Program.cs` on top of the library
+- **RenderCli** — multi-mode CLI (`benchmark` / `render` / `list-devices` subcommands); a single `Program.cs` on top of the library
 - **FractalGpu.RenderServer** — ASP.NET Core queue-driven render API
 
 `src/FractalBrowser` (legacy WinForms, .NET Framework 3.5) is outside the solution, carries its own old copies of the rendering code, and must not be modified unless the task explicitly requires it.
@@ -22,6 +22,7 @@ dotnet build FractalGpu.slnx -c Release
 dotnet run -c Release --project src/RenderCli -- list-devices
 dotnet run -c Release --project src/RenderCli -- benchmark --device 0   # index from list-devices; repeatable (-d 0 2) to compare devices
 dotnet run -c Release --project src/RenderCli -- benchmark              # no --device: benchmarks all devices, prints comparison summary
+dotnet run -c Release --project src/RenderCli -- render -d 0 -o out.bmp # render to BMP on a device; --size, --iterations, --pattern optional
 
 # Render server (http://localhost:5229, see Properties/launchSettings.json)
 dotnet run --project src/FractalGpu.RenderServer

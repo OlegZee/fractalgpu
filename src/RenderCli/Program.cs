@@ -3,36 +3,6 @@
 using FractalGpu.Rendering.Common;
 using FractalGpu.Rendering.Fractal;
 
-void Render(LyapRendererBase renderer, string? fileName)
-{
-    var picSize = 256;
-    var iterations = 10000;
-
-    var settings = new Lyapunov.Settings
-    {
-        A = new Range<double>(2, 4),
-        B = new Range<double>(2, 4),
-        Pattern = "ab",
-        InitialValue = 0.5,
-        Warmup = iterations / 10,
-        Iterations = iterations,
-        Size = new Sz(picSize, picSize),
-        Contrast = 1.7,
-    };
-
-    var startTime = DateTime.Now;
-    var bmp = renderer.Render(settings);
-
-    var execTime = DateTime.Now - startTime;
-    var perf = settings.Size.Width * settings.Size.Height * settings.Iterations/1024/1024/execTime.TotalSeconds;
-
-    Console.WriteLine(string.Format("Rendering time: {0:#0.000}s {6:#0.##}mis '{1}' N{2} {3}x{4} @{5}",
-        execTime.TotalSeconds, settings.Pattern, settings.Iterations,
-        settings.Size.Width, settings.Size.Height, renderer, perf));
-
-    if(!string.IsNullOrEmpty(fileName)) bmp.Save(fileName);
-}
-
 BenchResult Benchmark(DeviceDescriptor device)
 {
     var renderer = device.CreateRenderer();
@@ -173,6 +143,91 @@ benchmarkCommand.SetAction(parseResult =>
     return anyFailed ? 1 : 0;
 });
 
+var renderDeviceOption = new Option<int>("--device", "-d")
+{
+    Description = "Device index from 'list-devices'. Default: preferred device",
+    DefaultValueFactory = _ => DeviceRegistry.DefaultIndex(),
+};
+var outputOption = new Option<string>("--output", "-o")
+{
+    Description = "Output BMP file path",
+    DefaultValueFactory = _ => "fractal.bmp",
+};
+var sizeOption = new Option<int>("--size")
+{
+    Description = "Image size in pixels (square)",
+    DefaultValueFactory = _ => 512,
+};
+var iterationsOption = new Option<int>("--iterations")
+{
+    Description = "Number of iterations per pixel (warmup is iterations/10)",
+    DefaultValueFactory = _ => 10000,
+};
+var patternOption = new Option<string>("--pattern")
+{
+    Description = "Lyapunov sequence pattern",
+    DefaultValueFactory = _ => "ab",
+};
+
+var renderCommand = new Command("render", "Render a Lyapunov fractal to a BMP file on a selected device");
+renderCommand.Options.Add(renderDeviceOption);
+renderCommand.Options.Add(outputOption);
+renderCommand.Options.Add(sizeOption);
+renderCommand.Options.Add(iterationsOption);
+renderCommand.Options.Add(patternOption);
+renderCommand.SetAction(parseResult =>
+{
+    var deviceIndex = parseResult.GetValue(renderDeviceOption);
+    var output = parseResult.GetValue(outputOption)!;
+    var picSize = parseResult.GetValue(sizeOption);
+    var iterations = parseResult.GetValue(iterationsOption);
+    var pattern = parseResult.GetValue(patternOption)!;
+
+    DeviceDescriptor device;
+    try { device = DeviceRegistry.GetByIndex(deviceIndex); }
+    catch (ArgumentException ex)
+    {
+        Console.Error.WriteLine($"Error: {ex.Message} Run 'list-devices' to see available devices.");
+        return 1;
+    }
+
+    var settings = new Lyapunov.Settings
+    {
+        A = new Range<double>(2, 4),
+        B = new Range<double>(2, 4),
+        Pattern = pattern,
+        InitialValue = 0.5,
+        Warmup = iterations / 10,
+        Iterations = iterations,
+        Size = new Sz(picSize, picSize),
+        Contrast = 1.7,
+    };
+
+    try
+    {
+        var renderer = device.CreateRenderer();
+        Console.WriteLine($"fractalgpu render on [{device.Index}] {device.Name} @{renderer}");
+
+        var startTime = DateTime.Now;
+        var bmp = renderer.Render(settings);
+        var execTime = DateTime.Now - startTime;
+
+        bmp.Save(output);
+
+        Console.WriteLine(string.Format("Rendering time: {0:#0.000}s '{1}' N{2} {3}x{4}",
+            execTime.TotalSeconds, settings.Pattern, settings.Iterations,
+            settings.Size.Width, settings.Size.Height));
+        Console.WriteLine($"Saved to {output}");
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"Error: {ex.Message}");
+        return 1;
+    }
+
+    return 0;
+});
+
 var listDevicesCommand = new Command("list-devices", "List all available render devices (CPU modes and OpenCL devices) with their indexes");
 listDevicesCommand.SetAction(_ =>
 {
@@ -182,6 +237,7 @@ listDevicesCommand.SetAction(_ =>
 
 var rootCommand = new RootCommand("FractalGPU RenderCli — Lyapunov fractal rendering and benchmarking");
 rootCommand.Subcommands.Add(benchmarkCommand);
+rootCommand.Subcommands.Add(renderCommand);
 rootCommand.Subcommands.Add(listDevicesCommand);
 rootCommand.SetAction(_ =>
 {
