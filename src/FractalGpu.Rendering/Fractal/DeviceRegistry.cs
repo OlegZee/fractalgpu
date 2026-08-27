@@ -4,7 +4,10 @@
     {
         Cpu,
         MultiCore,
-        OpenCl
+        CpuPerf,
+        MultiCorePerf,
+        OpenCl,
+        OpenClPerf
     }
 
     public sealed record DeviceDescriptor(int Index, DeviceKind Kind, string Name, string Details, Func<LyapRendererBase> CreateRenderer);
@@ -18,11 +21,19 @@
 
         public static IReadOnlyList<DeviceDescriptor> Enumerate(out string? openClError)
         {
+            var perfDetails = System.Numerics.Vector.IsHardwareAccelerated
+                ? $"deferred log + SIMD: Vector<double> {System.Numerics.Vector<double>.Count} lanes ({System.Numerics.Vector<byte>.Count * 8}-bit)"
+                : "not hardware accelerated, falls back to scalar";
+
             var devices = new List<DeviceDescriptor>
             {
                 new(0, DeviceKind.Cpu, "CPU (single core)", "", () => new LyapRendererCpu()),
                 new(1, DeviceKind.MultiCore, $"CPU (multi-core, {Environment.ProcessorCount} threads)", "",
                     () => new LyapRendererMulticore<LyapRendererCpu>(MultiCoreTiles)),
+                new(2, DeviceKind.CpuPerf, "CPU (single core, perf)", perfDetails,
+                    () => new LyapRendererCpuPerf()),
+                new(3, DeviceKind.MultiCorePerf, $"CPU (multi-core perf, {Environment.ProcessorCount} threads)", perfDetails,
+                    () => new LyapRendererMulticore<LyapRendererCpuPerf>(MultiCoreTiles)),
             };
 
             openClError = null;
@@ -36,6 +47,17 @@
 
                     devices.Add(new DeviceDescriptor(devices.Count, DeviceKind.OpenCl, info.Name, details,
                         () => new LyapRendererOpenCl(info.Index)));
+                }
+
+                // perf variants come after all regular OpenCL devices so existing indices stay stable
+                foreach (var info in oclDevices)
+                {
+                    var details = $"({info.DeviceType})  platform: {info.PlatformName} {info.PlatformVersion}  CUs: {info.MaxComputeUnits}  mem: {info.GlobalMemoryBytes / (1024 * 1024)} MB  driver: {info.DriverVersion}";
+                    if (!info.Available) details += "  [UNAVAILABLE]";
+                    details += "  fast-relaxed-math: output statistically equivalent, not pixel-reproducible";
+
+                    devices.Add(new DeviceDescriptor(devices.Count, DeviceKind.OpenClPerf, $"{info.Name} (perf)", details,
+                        () => new LyapRendererOpenClPerf(info.Index)));
                 }
             }
             catch (Exception ex)
@@ -60,7 +82,7 @@
         {
             var devices = Enumerate(out _);
             var firstGpu = devices.FirstOrDefault(d => d.Kind == DeviceKind.OpenCl);
-            return firstGpu?.Index ?? 1;
+            return firstGpu?.Index ?? devices.First(d => d.Kind == DeviceKind.MultiCorePerf).Index;
         }
     }
 }
