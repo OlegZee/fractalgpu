@@ -4,8 +4,8 @@
     {
         Cpu,
         MultiCore,
-        CpuOptimized,
-        MultiCoreOptimized,
+        CpuPerf,
+        MultiCorePerf,
         OpenCl
     }
 
@@ -20,7 +20,7 @@
 
         public static IReadOnlyList<DeviceDescriptor> Enumerate(out string? openClError)
         {
-            var optimizedDetails = System.Numerics.Vector.IsHardwareAccelerated
+            var perfDetails = System.Numerics.Vector.IsHardwareAccelerated
                 ? $"deferred log + SIMD: Vector<double> {System.Numerics.Vector<double>.Count} lanes ({System.Numerics.Vector<byte>.Count * 8}-bit)"
                 : "not hardware accelerated, falls back to scalar";
 
@@ -29,10 +29,10 @@
                 new(0, DeviceKind.Cpu, "CPU (single core)", "", () => new LyapRendererCpu()),
                 new(1, DeviceKind.MultiCore, $"CPU (multi-core, {Environment.ProcessorCount} threads)", "",
                     () => new LyapRendererMulticore<LyapRendererCpu>(MultiCoreTiles)),
-                new(2, DeviceKind.CpuOptimized, "CPU (single core, optimized)", optimizedDetails,
-                    () => new LyapRendererCpuOptimized()),
-                new(3, DeviceKind.MultiCoreOptimized, $"CPU (multi-core optimized, {Environment.ProcessorCount} threads)", optimizedDetails,
-                    () => new LyapRendererMulticore<LyapRendererCpuOptimized>(MultiCoreTiles)),
+                new(2, DeviceKind.CpuPerf, "CPU (single core, perf)", perfDetails,
+                    () => new LyapRendererCpuPerf()),
+                new(3, DeviceKind.MultiCorePerf, $"CPU (multi-core perf, {Environment.ProcessorCount} threads)", perfDetails,
+                    () => new LyapRendererMulticore<LyapRendererCpuPerf>(MultiCoreTiles)),
             };
 
             openClError = null;
@@ -70,7 +70,7 @@
         {
             var devices = Enumerate(out _);
             var firstGpu = devices.FirstOrDefault(d => d.Kind == DeviceKind.OpenCl);
-            return firstGpu?.Index ?? devices.First(d => d.Kind == DeviceKind.MultiCoreOptimized).Index;
+            return firstGpu?.Index ?? devices.First(d => d.Kind == DeviceKind.MultiCorePerf).Index;
         }
     }
 }
