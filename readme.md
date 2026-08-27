@@ -61,7 +61,9 @@ Options: `--device`/`-d` device index, `--output`/`-o` output path, `--size` squ
 
 ### SIMD rendering
 
-`LyapRendererSimd` vectorizes the Lyapunov inner loop with variable-width `System.Numerics.Vector<double>` and the built-in `Vector.Log` (.NET 9+): the same code path runs 128-bit NEON on ARM64 (Apple Silicon), 256-bit AVX2 on x64, and falls back to the scalar renderer where hardware acceleration is unavailable. On AVX-512 machines set `DOTNET_MaxVectorTBitWidth=512` to unlock 512-bit vectors. Output matches the scalar renderer at float precision.
+`LyapRendererSimd` vectorizes the Lyapunov inner loop with variable-width `System.Numerics.Vector<double>`: the same code path runs 128-bit NEON on ARM64 (Apple Silicon), 256-bit AVX2 on x64, and falls back to the scalar renderer where hardware acceleration is unavailable. On AVX-512 machines set `DOTNET_MaxVectorTBitWidth=512` to unlock 512-bit vectors.
+
+Instead of a transcendental log per iteration it uses a deferred log (Benettin-style renormalization): the `|r·(1−2x)|` derivatives are accumulated into a running product whose IEEE-754 exponent is periodically moved into an integer accumulator with exact bit operations, leaving a single `Math.Log2` per pixel. Lanes that hit special values (zero derivative, Inf/NaN) are recomputed with the scalar code, so output stays byte-identical to the scalar renderer (~9× faster single-core on Apple M-series, more on wider vectors).
 
 Run with no `--device` (benchmarks ALL available devices sequentially and prints a comparison summary):
 
