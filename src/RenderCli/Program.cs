@@ -135,9 +135,20 @@ benchmarkCommand.SetAction(parseResult =>
 
     if (results.Count > 1)
     {
+        // Speedup column is relative to the single-core CPU baseline when it was benchmarked,
+        // otherwise to the slowest device in this run.
+        var baseline = results.FirstOrDefault(r => r.Device.Kind == DeviceKind.Cpu)
+                       ?? results.MinBy(r => r.PeakMis)!;
+        var nameWidth = results.Max(r => r.Device.Name.Length + $"[{r.Device.Index}] ".Length);
+
         Console.WriteLine("Summary (peak throughput):");
-        foreach (var r in results)
-            Console.WriteLine($"  [{r.Device.Index}] {r.Device.Name}: {r.PeakMis:#0.##}mis ({r.PeakSize.Width}x{r.PeakSize.Height} N{r.PeakIterations})");
+        Console.WriteLine($"  {"Device".PadRight(nameWidth)}  {"Peak mis",12}  {"At",-16}  {$"x vs [{baseline.Device.Index}]",10}");
+        foreach (var r in results.OrderBy(r => r.PeakMis))
+        {
+            var speedup = r.PeakMis / baseline.PeakMis;
+            Console.WriteLine(
+                $"  {$"[{r.Device.Index}] {r.Device.Name}".PadRight(nameWidth)}  {r.PeakMis,12:#,0.##}  {$"{r.PeakSize.Width}x{r.PeakSize.Height} N{r.PeakIterations}",-16}  {speedup,9:#,0.0}x");
+        }
     }
 
     return anyFailed ? 1 : 0;
