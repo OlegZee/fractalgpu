@@ -4,6 +4,8 @@
     {
         Cpu,
         MultiCore,
+        CpuSimd,
+        MultiCoreSimd,
         OpenCl
     }
 
@@ -18,11 +20,19 @@
 
         public static IReadOnlyList<DeviceDescriptor> Enumerate(out string? openClError)
         {
+            var simdDetails = System.Numerics.Vector.IsHardwareAccelerated
+                ? $"Vector<double> {System.Numerics.Vector<double>.Count} lanes ({System.Numerics.Vector<byte>.Count * 8}-bit)"
+                : "not hardware accelerated, falls back to scalar";
+
             var devices = new List<DeviceDescriptor>
             {
                 new(0, DeviceKind.Cpu, "CPU (single core)", "", () => new LyapRendererCpu()),
                 new(1, DeviceKind.MultiCore, $"CPU (multi-core, {Environment.ProcessorCount} threads)", "",
                     () => new LyapRendererMulticore<LyapRendererCpu>(MultiCoreTiles)),
+                new(2, DeviceKind.CpuSimd, "CPU (single core, SIMD)", simdDetails,
+                    () => new LyapRendererSimd()),
+                new(3, DeviceKind.MultiCoreSimd, $"CPU (multi-core SIMD, {Environment.ProcessorCount} threads)", simdDetails,
+                    () => new LyapRendererMulticore<LyapRendererSimd>(MultiCoreTiles)),
             };
 
             openClError = null;
@@ -60,7 +70,7 @@
         {
             var devices = Enumerate(out _);
             var firstGpu = devices.FirstOrDefault(d => d.Kind == DeviceKind.OpenCl);
-            return firstGpu?.Index ?? 1;
+            return firstGpu?.Index ?? devices.First(d => d.Kind == DeviceKind.MultiCoreSimd).Index;
         }
     }
 }
