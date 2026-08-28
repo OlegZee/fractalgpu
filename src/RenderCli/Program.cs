@@ -147,7 +147,7 @@ benchmarkCommand.SetAction(parseResult =>
         {
             var speedup = r.PeakMis / baseline.PeakMis;
             Console.WriteLine(
-                $"  {$"[{r.Device.Index}] {r.Device.Name}".PadRight(nameWidth)}  {r.PeakMis,12:#,0.##}  {$"{r.PeakSize.Width}x{r.PeakSize.Height} N{r.PeakIterations}",-16}  {speedup,9:#,0.0}x");
+                $"  {$"[{r.Device.Index}] {r.Device.Name}".PadRight(nameWidth)}  {r.PeakMis,12:#,0.0}  {$"{r.PeakSize.Width}x{r.PeakSize.Height} N{r.PeakIterations}",-16}  {speedup,9:#,0.0}x");
         }
     }
 
