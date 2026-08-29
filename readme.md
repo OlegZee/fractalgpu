@@ -4,7 +4,7 @@ Copyright (c) 2025 FractalGPU Project. All rights reserved.
 
 ## Fractal Browser (interactive GUI)
 
-`FractalGpu.Browser` is a cross-platform Avalonia desktop app for exploring the Lyapunov fractal interactively. It replaces the frozen WinForms `src/FractalBrowser`, which had no navigation at all — one Start button, six hard-coded regions, and a synchronous render that froze the window.
+`FractalGpu.Browser` is a cross-platform Avalonia desktop app for exploring the Lyapunov fractal interactively. It replaced the original WinForms viewer (removed in 2026), which had no navigation at all — one Start button, six hard-coded regions, and a synchronous render that froze the window.
 
 ```bash
 dotnet run -c Release --project src/FractalGpu.Browser
