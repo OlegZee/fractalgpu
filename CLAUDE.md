@@ -11,8 +11,6 @@ FractalGPU renders Lyapunov fractals on multiple backends (single-core CPU, mult
 - **FractalGpu.RenderServer** — ASP.NET Core queue-driven render API
 - **FractalGpu.Browser** — Avalonia desktop app for interactive exploration (pan/zoom/history/export)
 
-`src/FractalBrowser` (legacy WinForms, .NET Framework 3.5) is outside the solution, carries its own old copies of the rendering code, and must not be modified unless the task explicitly requires it.
-
 ## Development Commands
 
 ```bash
@@ -73,6 +71,5 @@ Render sizes are rounded up to a multiple of 16 and the view widened by the same
 ## Conventions and Gotchas
 
 - CLI parsing uses **System.CommandLine 2.0 GA** (`Option<T>` object initializers, `command.SetAction(parseResult => ...)`, `rootCommand.Parse(args).Invoke()`). The widely-documented beta APIs (`AddOption`, `SetHandler`, `InvokeAsync(args)`) do not exist in GA and will not compile.
-- Never duplicate rendering logic across projects — extend `FractalGpu.Rendering` and reference it. The only sanctioned duplication is the frozen legacy FractalBrowser.
-- `libs/` holds checked-in legacy binaries (Microsoft Accelerator for FractalBrowser); don't touch without coordination.
-- Historical docs (`PRPs/`, `.serena/`, `.qwen/`) describe past project states and are intentionally not kept up to date; `readme.md` and `CLAUDE.md` are the living documentation.
+- Never duplicate rendering logic across projects — extend `FractalGpu.Rendering` and reference it. Every project in the solution consumes the library; there is no sanctioned second copy.
+- Historical docs (`PRPs/`) describe past project states and are intentionally not kept up to date; `readme.md` and `CLAUDE.md` are the living documentation.
