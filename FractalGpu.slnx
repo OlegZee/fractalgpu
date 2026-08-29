@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/FractalGpu.Browser/FractalGpu.Browser.csproj" />
     <Project Path="src/FractalGpu.Rendering/FractalGpu.Rendering.csproj" />
     <Project Path="src/FractalGpu.RenderServer/FractalGpu.RenderServer.csproj" />
     <Project Path="src/RenderCli/RenderCli.csproj" />

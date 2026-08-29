@@ -1,0 +1,145 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:FractalGpu.Browser.ViewModels"
+        xmlns:views="clr-namespace:FractalGpu.Browser.Views"
+        xmlns:core="clr-namespace:FractalGpu.Browser.Core"
+        xmlns:fractal="clr-namespace:FractalGpu.Rendering.Fractal;assembly=FractalGpu.Rendering"
+        x:Class="FractalGpu.Browser.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Lyapunov Browser"
+        Width="1280" Height="820"
+        MinWidth="720" MinHeight="480"
+        Background="#101014">
+
+  <Window.KeyBindings>
+    <KeyBinding Gesture="Alt+Left" Command="{Binding BackCommand}" />
+    <KeyBinding Gesture="Alt+Right" Command="{Binding ForwardCommand}" />
+    <KeyBinding Gesture="Ctrl+0" Command="{Binding ResetViewCommand}" />
+    <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveImageCommand}" />
+  </Window.KeyBindings>
+
+  <DockPanel LastChildFill="True">
+
+    <!-- Toolbar -->
+    <Border DockPanel.Dock="Top" Background="#181820" BorderBrush="#2A2A34" BorderThickness="0,0,0,1" Padding="8,6">
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="4">
+          <Button Command="{Binding BackCommand}" ToolTip.Tip="Back (Alt+Left)" Content="◀" Width="34" />
+          <Button Command="{Binding ForwardCommand}" ToolTip.Tip="Forward (Alt+Right)" Content="▶" Width="34" />
+          <Button Command="{Binding ResetViewCommand}" ToolTip.Tip="Reset to preset region (Ctrl+0)" Content="⌂" Width="34" />
+          <Button Command="{Binding ZoomOutCommand}" ToolTip.Tip="Zoom out" Content="−" Width="34" />
+          <Button Command="{Binding ZoomInCommand}" ToolTip.Tip="Zoom in" Content="+" Width="34" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="16,0,0,0" VerticalAlignment="Center">
+          <TextBlock Text="Preset" Classes="status" Opacity="0.6" />
+          <ComboBox ItemsSource="{Binding PresetList}" SelectedItem="{Binding SelectedPreset}"
+                    MinWidth="160" PlaceholderText="Custom region">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="core:Preset">
+                <TextBlock Text="{Binding Name}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+
+          <TextBlock Text="Device" Classes="status" Opacity="0.6" Margin="12,0,0,0" />
+          <ComboBox ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice}"
+                    MinWidth="230" ToolTip.Tip="{Binding DeviceDetails}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="fractal:DeviceDescriptor">
+                <TextBlock Text="{Binding Name}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+
+        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6">
+          <Button Command="{Binding SaveImageCommand}" Content="Save image…" ToolTip.Tip="Render at export scale and save a PNG (Ctrl+S)" />
+          <ToggleButton IsChecked="{Binding ShowPanel}" Content="Settings" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Status bar -->
+    <Border DockPanel.Dock="Bottom" Background="#181820" BorderBrush="#2A2A34" BorderThickness="0,1,0,0" Padding="10,5">
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+        <ProgressBar Grid.Column="0" IsIndeterminate="True" IsVisible="{Binding IsBusy}"
+                     Width="70" Height="3" Margin="0,0,10,0" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="1" Classes="status" Text="{Binding StatusText}" />
+        <TextBlock Grid.Column="2" Classes="status" HorizontalAlignment="Center" Opacity="0.85"
+                   Text="{Binding CursorText}" FontFamily="monospace" />
+        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="12">
+          <TextBlock Classes="status" Foreground="#FFC845" Text="{Binding PrecisionWarning}"
+                     IsVisible="{Binding HasPrecisionWarning}" />
+          <TextBlock Classes="status" Foreground="#FF6B6B" Text="{Binding ErrorText}"
+                     IsVisible="{Binding HasError}" MaxWidth="420" TextTrimming="CharacterEllipsis" />
+          <TextBlock Classes="status" Opacity="0.7" Text="{Binding ZoomText}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- Settings panel -->
+    <Border DockPanel.Dock="Right" Width="280" Background="#14141A" BorderBrush="#2A2A34"
+            BorderThickness="1,0,0,0" IsVisible="{Binding ShowPanel}">
+      <ScrollViewer>
+        <StackPanel Margin="14,4,14,16">
+
+          <TextBlock Classes="section" Text="SEQUENCE" />
+          <TextBox Text="{Binding Pattern}" PlaceholderText="ab" FontFamily="monospace" />
+          <TextBlock Text="{Binding PatternError}" IsVisible="{Binding HasPatternError}"
+                     Foreground="#FF6B6B" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0" />
+
+          <TextBlock Classes="section" Text="ACCURACY" />
+          <TextBlock Classes="field" Text="Iterations" />
+          <Grid ColumnDefinitions="*,72">
+            <Slider Grid.Column="0" Minimum="1.4" Maximum="5.3" Value="{Binding IterationsLog}" />
+            <TextBox Grid.Column="1" Text="{Binding Iterations}" VerticalAlignment="Center" />
+          </Grid>
+
+          <TextBlock Classes="field" Text="Warm-up (discarded iterations)" />
+          <TextBox Text="{Binding Warmup}" />
+
+          <TextBlock Classes="field" Text="{Binding InitialValue, StringFormat='Initial x₀: {0:0.000}'}" />
+          <Slider Minimum="0.001" Maximum="0.999" Value="{Binding InitialValue}" />
+
+          <TextBlock Classes="section" Text="COLOUR" />
+          <TextBlock Classes="field" Text="Palette" />
+          <ComboBox ItemsSource="{Binding Palettes}" SelectedItem="{Binding SelectedPalette}"
+                    HorizontalAlignment="Stretch">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="core:Palette">
+                <TextBlock Text="{Binding Name}" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+
+          <TextBlock Classes="field" Text="{Binding Contrast, StringFormat='Contrast: {0:0.00}'}" />
+          <Slider Minimum="0.2" Maximum="6" Value="{Binding Contrast}" />
+          <TextBlock FontSize="11" Opacity="0.5" TextWrapping="Wrap"
+                     Text="Palette and contrast recolour the cached exponent map — no re-render." />
+
+          <CheckBox IsChecked="{Binding SmoothScaling}" Content="Smooth scaling" Margin="0,10,0,0" />
+
+          <TextBlock Classes="section" Text="EXPORT" />
+          <TextBlock Classes="field" Text="{Binding ExportScale, StringFormat='Resolution multiplier: {0}×'}" />
+          <Slider Minimum="1" Maximum="8" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding ExportScale}" />
+
+          <TextBlock Classes="section" Text="COORDINATES" />
+          <TextBox Text="{Binding ViewText}" FontSize="11" FontFamily="monospace" AcceptsReturn="False" />
+          <Button Content="Go to region" Command="{Binding GoToViewCommand}" HorizontalAlignment="Stretch" Margin="0,6,0,0" />
+          <TextBlock FontSize="11" Opacity="0.5" TextWrapping="Wrap" Margin="0,4,0,0"
+                     Text="minA;maxA;minB;maxB — copy this to save or share a spot." />
+
+          <TextBlock Classes="section" Text="CONTROLS" />
+          <TextBlock FontSize="11" Opacity="0.6" TextWrapping="Wrap" LineHeight="18"
+                     Text="Wheel — zoom at cursor&#x0a;Drag — pan&#x0a;Right-drag / Shift+drag — zoom to box&#x0a;Double-click — zoom in&#x0a;Arrows — pan, +/− — zoom&#x0a;Alt+←/→ — history, Ctrl+0 — reset" />
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+
+    <!-- Viewport -->
+    <views:FractalCanvas x:Name="Canvas" />
+
+  </DockPanel>
+</Window>

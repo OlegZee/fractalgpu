@@ -25,19 +25,23 @@ namespace FractalGpu.Rendering.Fractal
             var coreRenderer = new TBaseRenderer();
 
             var result = new float[w, h];
-            var handles = new AutoResetEvent[_splitTilesCount];
+            // Never more tiles than rows, otherwise the tail tiles are empty.
+            var tileCount = Math.Clamp(_splitTilesCount, 1, Math.Max(h, 1));
+            var handles = new AutoResetEvent[tileCount];
 
-            for (var tileIndex = 0; tileIndex < _splitTilesCount; tileIndex++)
+            // Each tile must reproduce the single-core mapping a = A.Start + j * ascale for its own
+            // rows, so the sub-range is derived from the tile's actual row bounds. Splitting the A
+            // range into equal parts instead breaks whenever h is not a multiple of the tile count:
+            // the last tile keeps the leftover rows but only 1/tileCount of the range.
+            var ascale = (settings.A.End - settings.A.Start) / h;
+
+            for (var tileIndex = 0; tileIndex < tileCount; tileIndex++)
             {
-                var tileHeight = h / _splitTilesCount;
-                var tileStart = tileHeight * tileIndex;
-                // handle error for last tile
-                if (tileIndex == _splitTilesCount - 1)
-                    tileHeight = h - tileHeight * (_splitTilesCount - 1);
+                var tileStart = (int)((long)h * tileIndex / tileCount);
+                var tileHeight = (int)((long)h * (tileIndex + 1) / tileCount) - tileStart;
 
-                var bPerTile = (settings.A.End - settings.A.Start) / _splitTilesCount;
-                var a = settings.A.Start + tileIndex * bPerTile;
-                var tileSettings = settings with { A = new Range<double>(a, a + bPerTile) };
+                var a = settings.A.Start + tileStart * ascale;
+                var tileSettings = settings with { A = new Range<double>(a, a + tileHeight * ascale) };
 
                 handles[tileIndex] = new AutoResetEvent(false);
 
