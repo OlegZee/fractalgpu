@@ -79,12 +79,17 @@ sudo dotnet workload install ios macos
 Deploying to your own device **without a paid developer account** uses Apple's free provisioning
 (7-day profile, up to 3 apps, device must be plugged in):
 
-1. In Xcode: Settings → Accounts → add your Apple ID (a *Personal Team* appears).
-2. Create any empty iOS App project in Xcode, set its bundle identifier to `com.olegzee.fractalgpu.bench`
-   (the `ApplicationId` in `FractalGpu.BenchIos.csproj`), pick your Personal Team under Signing & Capabilities
-   and run it once on the device. This makes Xcode create the development certificate and provisioning profile,
-   and registers the device. Trust the developer on the device (Settings → General → VPN & Device Management).
-3. Build and deploy the .NET app; it picks up the matching profile automatically:
+1. On the device: plug it in, tap *Trust This Computer*, and enable Settings → Privacy & Security → *Developer Mode*
+   (reboots once). Without Developer Mode Xcode lists the device but cannot prepare it.
+2. In Xcode: Settings → Accounts → add your Apple ID (a *Personal Team* appears).
+3. Create any empty iOS App project in Xcode, set its bundle identifier to `com.olegzee.fractalgpu.bench`
+   (the `ApplicationId` in `FractalGpu.BenchIos.csproj`), pick your Personal Team under Signing & Capabilities,
+   select the device as run destination and run it once. This makes Xcode create the development certificate and
+   provisioning profile, and registers the device. Trust the developer on the device
+   (Settings → General → VPN & Device Management). Save the Xcode project somewhere: it is the easiest way to
+   refresh the profile later and to register another device (select it as destination, Run once; the profile is
+   reissued for both devices and the next .NET build picks it up).
+4. Build and deploy the .NET app; it picks up the matching profile automatically:
 
 ```bash
 dotnet build FractalGpu.Apple.slnx -c Release                       # compiles everything incl. the macOS Metal target
@@ -98,8 +103,18 @@ as run destination. The .NET installer needs the device passed explicitly (`_Dev
 built with `-p:EnableCodeSigning=false`, delete its `bin/` and `obj/` before a signed build, otherwise the stale
 unsigned bundle is reused and the device rejects it with "No code signature found".
 
-The profile expires after 7 days; re-running step 2's Xcode project refreshes it. To use a different bundle id,
+The profile expires after 7 days; re-running step 3's Xcode project refreshes it. To use a different bundle id,
 change `ApplicationId` and the Xcode project together.
+
+### Taking a measurement
+
+1. Let the device cool down with the screen off (no case, not in hand), keep it plugged in. The header line
+   `Thermal:` must read `Nominal` before you start; otherwise wait.
+2. Tap **Run** and leave the device alone until the `Summary` table appears (5-15 minutes; the screen stays on).
+3. Check `Thermal at the end`. `Fair` is normal. `Serious`/`Critical` means the run was throttled: let it cool
+   and run again; if the second run agrees within a few percent, throttling did not affect the figures.
+4. Tap **Copy**, paste the text verbatim into `benchmark-results/<hw.machine>.txt` (e.g. `iphone18.4.txt`, the
+   identifier is in the `Machine:` header line) and add a row to the table below. Never edit the logs.
 
 ## Benchmark results
 
