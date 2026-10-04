@@ -51,6 +51,73 @@ Prerequisites:
 dotnet run -c Release --project src/RenderCli -- benchmark
 ```
 
+The escalating benchmark itself (size/iteration ladder, "mis" throughput, the comparison table) lives in the
+library as `FractalGpu.Rendering.Benchmarking.Benchmark`, so RenderCli and the iOS bench app run the exact same
+code and their outputs are directly comparable. Both start with a machine header (model, CPU, cores, memory, OS, .NET version, date) so pasted results stay identifiable.
+
+## iPad / iPhone benchmark (FractalGpu.BenchIos)
+
+`src/FractalGpu.BenchIos` is a minimal UIKit app that runs the shared benchmark on every CPU mode and on the
+device's Metal GPU, shows the log in a monospaced view and copies it to the clipboard with the **Copy** button.
+There is no OpenCL on iOS, so the GPU path is `FractalGpu.Rendering.Metal` — a straight port of the reference
+OpenCL kernel to Metal Shading Language (`LyapRendererMetal`, same four-B-values-per-thread decomposition, no
+fast-math, `fast::log` standing in for `native_log`) plus a `(perf)` entry per GPU, `LyapRendererMetalPerf`, the port
+of the fast-math OpenCL perf kernel (pattern bitmask in registers, one `fast::log2` per 4 iterations, pattern
+specialised through preprocessor macros). On an M5 Pro both Metal ports are bit-identical to their OpenCL
+counterparts and within 4% of their throughput, so iPad/iPhone numbers are directly comparable to the desktop
+OpenCL table. The app is built with NativeAOT so the CPU numbers reflect
+RyuJIT-quality codegen (`Vector<double>` is 2 lanes on arm64).
+
+Prerequisites (one-off, on a Mac):
+
+```bash
+sudo xcodebuild -license accept
+sudo xcode-select -s /Applications/Xcode.app
+sudo dotnet workload install ios macos
+```
+
+Deploying to your own device **without a paid developer account** uses Apple's free provisioning
+(7-day profile, up to 3 apps, device must be plugged in):
+
+1. In Xcode: Settings → Accounts → add your Apple ID (a *Personal Team* appears).
+2. Create any empty iOS App project in Xcode, set its bundle identifier to `com.olegzee.fractalgpu.bench`
+   (the `ApplicationId` in `FractalGpu.BenchIos.csproj`), pick your Personal Team under Signing & Capabilities
+   and run it once on the device. This makes Xcode create the development certificate and provisioning profile,
+   and registers the device. Trust the developer on the device (Settings → General → VPN & Device Management).
+3. Build and deploy the .NET app; it picks up the matching profile automatically:
+
+```bash
+dotnet build FractalGpu.Apple.slnx -c Release                       # compiles everything incl. the macOS Metal target
+xcrun devicectl list devices                                        # UDID of the plugged-in device
+dotnet build src/FractalGpu.BenchIos -c Release -t:Run -p:_DeviceName=<UDID>   # installs and launches it
+```
+
+Notes: Xcode 27 creates the project before asking anything, so Team and Bundle Identifier are set afterwards under
+the target's *Signing & Capabilities*; the "team has no devices" error there goes away once the device is selected
+as run destination. The .NET installer needs the device passed explicitly (`_DeviceName`). If the app was ever
+built with `-p:EnableCodeSigning=false`, delete its `bin/` and `obj/` before a signed build, otherwise the stale
+unsigned bundle is reused and the device rejects it with "No code signature found".
+
+The profile expires after 7 days; re-running step 2's Xcode project refreshes it. To use a different bundle id,
+change `ApplicationId` and the Xcode project together.
+
+## Benchmark results
+
+Raw logs live in `benchmark-results/` (one file per machine, exactly as the benchmark printed them). Peak throughput in
+mis (mega-iterations per second, pixels x iterations / 2^20 / s), same `ab` pattern and escalation ladder everywhere;
+GPU columns are the pixel-reproducible path and the fast-math `(perf)` path. Measured 2026-10-04 on .NET 10.0.12.
+
+| Machine | CPU 1 core | CPU multi | CPU 1 core perf | CPU multi perf | GPU | GPU (perf) |
+|---|---:|---:|---:|---:|---:|---:|
+| MacBook Pro, M5 Pro, 18 cores, macOS 27.0.1 ([log](benchmark-results/mbp5pro.txt)) | 383 | 5,492 | 3,502 | 30,715 | 322,201 (OpenCL) | 733,202 (OpenCL) |
+| iPhone Air, A19 Pro, 6 cores, iOS 27.0.1 ([log](benchmark-results/iphone18.4.txt)) | 325 | 907 | 2,238 | 5,168 | 78,361 (Metal) | 196,805 (Metal) |
+| iPad Pro 11" 2018, A12X, 8 cores, iPadOS 26.7.1 ([log](benchmark-results/ipad8.1.txt)) | 142 | 641 | 1,331 | 4,027 | 31,991 (Metal) | 92,640 (Metal) |
+
+Reading the numbers: the A19 Pro performance core is within 15% of an M5 Pro core on the scalar path, but the phone has
+far fewer cores and ended the run in thermal state *Serious*, so its multi-core figures are throttled. The A12X scales
+poorly across its 8 cores (4 of them efficiency cores). The Metal ports are bit-identical to the OpenCL kernels, so GPU
+figures are directly comparable: the 2025 phone GPU is a quarter of a 20-core M5 Pro, the 2018 tablet GPU a tenth.
+
 ## RenderCli (multi-mode CLI)
 
 `RenderCli` is a multi-mode command-line tool. It lets you list available render devices (CPU modes and OpenCL GPU devices), run the escalating render benchmark against a specific one, and render a fractal image to a BMP file.

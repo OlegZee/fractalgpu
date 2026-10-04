@@ -1,0 +1,8 @@
+<Solution>
+  <!-- Apple-only companion solution: needs `dotnet workload install ios macos` and a full Xcode. -->
+  <Folder Name="/src/">
+    <Project Path="src/FractalGpu.Rendering/FractalGpu.Rendering.csproj" />
+    <Project Path="src/FractalGpu.Rendering.Metal/FractalGpu.Rendering.Metal.csproj" />
+    <Project Path="src/FractalGpu.BenchIos/FractalGpu.BenchIos.csproj" />
+  </Folder>
+</Solution>

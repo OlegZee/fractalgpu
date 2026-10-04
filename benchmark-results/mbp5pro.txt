@@ -1,0 +1,81 @@
+Machine: Mac17,9, Apple M5 Pro, 18 cores, 48 GB
+System:  macOS 27.0.1 (Arm64), .NET 10.0.12
+Date:    2026-10-04 22:20
+
+fractalgpu benchmark on [0] CPU (single core)
+Rendering time: 0.237s 263.68mis 'ab' N1000 256x256 @LyapRendererCpu
+Rendering time: 0.661s 377.99mis 'ab' N1000 512x512 @LyapRendererCpu
+Rendering time: 2.612s 382.85mis 'ab' N1000 1024x1024 @LyapRendererCpu
+Best: 382.85mis at 1024x1024 N1000 (total 3.5s)
+
+fractalgpu benchmark on [1] CPU (multi-core, 18 threads)
+Rendering time: 0.016s 4007.41mis 'ab' N1000 256x256 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 0.050s 4989.8mis 'ab' N1000 512x512 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 0.198s 5052.53mis 'ab' N1000 1024x1024 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 0.459s 5446.2mis 'ab' N2500 1024x1024 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 0.910s 5491.74mis 'ab' N5000 1024x1024 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 1.839s 5438.34mis 'ab' N10000 1024x1024 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 4.650s 5376.1mis 'ab' N25000 1024x1024 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Best: 5491.74mis at 1024x1024 N5000 (total 8.1s)
+
+fractalgpu benchmark on [2] CPU (single core, perf)
+  deferred log + SIMD: Vector<double> 2 lanes (128-bit)
+Rendering time: 0.101s 619.79mis 'ab' N1000 256x256 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 0.163s 1530.1mis 'ab' N1000 512x512 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 0.306s 3271.9mis 'ab' N1000 1024x1024 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 0.731s 3420.54mis 'ab' N2500 1024x1024 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 1.439s 3473.94mis 'ab' N5000 1024x1024 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 2.856s 3501.63mis 'ab' N10000 1024x1024 @LyapRendererCpuPerf[2 lanes, deferred log]
+Best: 3501.63mis at 1024x1024 N10000 (total 5.6s)
+
+fractalgpu benchmark on [3] CPU (multi-core perf, 18 threads)
+  deferred log + SIMD: Vector<double> 2 lanes (128-bit)
+Rendering time: 0.013s 4943.68mis 'ab' N1000 256x256 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.205s 1221.22mis 'ab' N1000 512x512 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.246s 4072.37mis 'ab' N1000 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.096s 26165.76mis 'ab' N2500 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.176s 28456.06mis 'ab' N5000 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.341s 29321.27mis 'ab' N10000 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.828s 30207.56mis 'ab' N25000 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 1.628s 30715.22mis 'ab' N50000 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 4.881s 23048.01mis 'ab' N50000 1536x1536 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Best: 30715.22mis at 1024x1024 N50000 (total 8.4s)
+
+fractalgpu benchmark on [4] Apple M5 Pro
+  (Gpu)  platform: Apple OpenCL 1.2 (Aug  8 2026 15:27:26)  CUs: 20  mem: 38338 MB  driver: 1.2 1.0
+Rendering time: 0.023s 2725.52mis 'ab' N1000 256x256 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 0.010s 24657.02mis 'ab' N1000 512x512 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 0.029s 34759.64mis 'ab' N1000 1024x1024 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 0.032s 78653.45mis 'ab' N2500 1024x1024 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 0.037s 135779.17mis 'ab' N5000 1024x1024 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 0.047s 214725.9mis 'ab' N10000 1024x1024 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 0.091s 275796.33mis 'ab' N25000 1024x1024 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 0.158s 316130.76mis 'ab' N50000 1024x1024 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 0.354s 317948.22mis 'ab' N50000 1536x1536 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 0.621s 322200.97mis 'ab' N50000 2048x2048 @LyapRendererOpenCl[Apple M5 Pro]
+Rendering time: 2.508s 319019.18mis 'ab' N50000 4096x4096 @LyapRendererOpenCl[Apple M5 Pro]
+Best: 322200.97mis at 2048x2048 N50000 (total 3.9s)
+
+fractalgpu benchmark on [5] Apple M5 Pro (perf)
+  (Gpu)  platform: Apple OpenCL 1.2 (Aug  8 2026 15:27:26)  CUs: 20  mem: 38338 MB  driver: 1.2 1.0  fast-relaxed-math: output statistically equivalent, not pixel-reproducible
+Rendering time: 0.014s 4386mis 'ab' N1000 256x256 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 0.005s 49355.42mis 'ab' N1000 512x512 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 0.020s 51110.11mis 'ab' N1000 1024x1024 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 0.020s 124723.74mis 'ab' N2500 1024x1024 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 0.023s 218333.94mis 'ab' N5000 1024x1024 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 0.030s 336906.79mis 'ab' N10000 1024x1024 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 0.044s 564563.48mis 'ab' N25000 1024x1024 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 0.070s 713005.36mis 'ab' N50000 1024x1024 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 0.153s 733202.33mis 'ab' N50000 1536x1536 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 0.274s 728908.93mis 'ab' N50000 2048x2048 @LyapRendererOpenClPerf[Apple M5 Pro]
+Rendering time: 1.113s 718870.89mis 'ab' N50000 4096x4096 @LyapRendererOpenClPerf[Apple M5 Pro]
+Best: 733202.33mis at 1536x1536 N50000 (total 1.8s)
+
+Summary (peak throughput):
+  Device                                     Peak mis  At                  x vs [0]
+  [0] CPU (single core)                         382.9  1024x1024 N1000         1.0x
+  [2] CPU (single core, perf)                 3,501.6  1024x1024 N10000        9.1x
+  [1] CPU (multi-core, 18 threads)            5,491.7  1024x1024 N5000        14.3x
+  [3] CPU (multi-core perf, 18 threads)      30,715.2  1024x1024 N50000       80.2x
+  [4] Apple M5 Pro                          322,201.0  2048x2048 N50000      841.6x
+  [5] Apple M5 Pro (perf)                   733,202.3  1536x1536 N50000    1,915.1x
