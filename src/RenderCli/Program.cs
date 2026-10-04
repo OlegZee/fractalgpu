@@ -1,69 +1,8 @@
 ﻿using System.CommandLine;
 
+using FractalGpu.Rendering.Benchmarking;
 using FractalGpu.Rendering.Common;
 using FractalGpu.Rendering.Fractal;
-
-BenchResult Benchmark(DeviceDescriptor device)
-{
-    var renderer = device.CreateRenderer();
-    var picSize = 256;
-    var numIterations = 1000;
-
-    var settings = new Lyapunov.Settings
-    {
-        A = new Range<double>(2, 4),
-        B = new Range<double>(2, 4),
-        Pattern = "ab",
-        InitialValue = 0.5,
-        Contrast = 1.7,
-    };
-
-    var steps = new[]
-    {
-        () => { picSize = 256; numIterations = 1000; },
-        () => { picSize = 512; },
-        () => { picSize = 1024; },
-        () => { numIterations = 2500; },
-        () => { numIterations = 5000; },
-        () => { numIterations = 10000; },
-        () => { numIterations = 25000; },
-        () => { numIterations = 50000; },
-        () => { picSize = 1536; },
-        () => { picSize = 2048; },
-        () => { picSize = 4096; },
-    };
-
-    var peakMis = 0.0;
-    var peakSize = new Sz(0, 0);
-    var peakIterations = 0;
-    var totalTime = TimeSpan.Zero;
-
-    TimeSpan execTime;
-    var stepIndex = 0;
-    do
-    {
-        steps[stepIndex]();
-        settings = settings with { Warmup = numIterations / 10, Iterations = numIterations, Size = new Sz(picSize, picSize) };
-
-        var startTime = DateTime.Now;
-        var bmp = renderer.Render(settings);
-
-        execTime = DateTime.Now - startTime;
-        var perf = settings.Size.Width * settings.Size.Height * settings.Iterations / 1024 / 1024 /
-                   execTime.TotalSeconds;
-
-        Console.WriteLine(string.Format("Rendering time: {0:#0.000}s {6:#0.##}mis '{1}' N{2} {3}x{4} @{5}",
-            execTime.TotalSeconds, settings.Pattern, settings.Iterations,
-            settings.Size.Width, settings.Size.Height, renderer, perf));
-
-        totalTime += execTime;
-        if (perf > peakMis) { peakMis = perf; peakSize = settings.Size; peakIterations = settings.Iterations; }
-
-        stepIndex++;
-    } while (execTime.TotalSeconds < 2.5 && stepIndex < steps.Length);
-
-    return new BenchResult(device, peakMis, peakSize, peakIterations, totalTime);
-}
 
 void PrintDeviceTable()
 {
@@ -113,6 +52,9 @@ benchmarkCommand.SetAction(parseResult =>
         }
     }
 
+    foreach (var line in MachineInfo.Header()) Console.WriteLine(line);
+    Console.WriteLine();
+
     var results = new List<BenchResult>();
     var anyFailed = false;
     foreach (var device in devices)
@@ -121,8 +63,8 @@ benchmarkCommand.SetAction(parseResult =>
         if (!string.IsNullOrEmpty(device.Details)) Console.WriteLine($"  {device.Details}");
         try
         {
-            var result = Benchmark(device);
-            Console.WriteLine($"Best: {result.PeakMis:#0.##}mis at {result.PeakSize.Width}x{result.PeakSize.Height} N{result.PeakIterations} (total {result.TotalTime.TotalSeconds:#0.0}s)");
+            var result = Benchmark.Run(device, Console.WriteLine);
+            Console.WriteLine(Benchmark.FormatBest(result));
             results.Add(result);
         }
         catch (Exception ex)
@@ -135,20 +77,8 @@ benchmarkCommand.SetAction(parseResult =>
 
     if (results.Count > 1)
     {
-        // Speedup column is relative to the single-core CPU baseline when it was benchmarked,
-        // otherwise to the slowest device in this run.
-        var baseline = results.FirstOrDefault(r => r.Device.Kind == DeviceKind.Cpu)
-                       ?? results.MinBy(r => r.PeakMis)!;
-        var nameWidth = results.Max(r => r.Device.Name.Length + $"[{r.Device.Index}] ".Length);
-
-        Console.WriteLine("Summary (peak throughput):");
-        Console.WriteLine($"  {"Device".PadRight(nameWidth)}  {"Peak mis",12}  {"At",-16}  {$"x vs [{baseline.Device.Index}]",10}");
-        foreach (var r in results.OrderBy(r => r.PeakMis))
-        {
-            var speedup = r.PeakMis / baseline.PeakMis;
-            Console.WriteLine(
-                $"  {$"[{r.Device.Index}] {r.Device.Name}".PadRight(nameWidth)}  {r.PeakMis,12:#,0.0}  {$"{r.PeakSize.Width}x{r.PeakSize.Height} N{r.PeakIterations}",-16}  {speedup,9:#,0.0}x");
-        }
+        foreach (var line in Benchmark.FormatSummary(results))
+            Console.WriteLine(line);
     }
 
     return anyFailed ? 1 : 0;
@@ -257,5 +187,3 @@ rootCommand.SetAction(_ =>
 });
 
 return rootCommand.Parse(args).Invoke();
-
-internal sealed record BenchResult(DeviceDescriptor Device, double PeakMis, Sz PeakSize, int PeakIterations, TimeSpan TotalTime);

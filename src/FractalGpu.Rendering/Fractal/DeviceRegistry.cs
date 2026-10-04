@@ -7,7 +7,9 @@
         CpuPerf,
         MultiCorePerf,
         OpenCl,
-        OpenClPerf
+        OpenClPerf,
+        Metal,
+        MetalPerf
     }
 
     public sealed record DeviceDescriptor(int Index, DeviceKind Kind, string Name, string Details, Func<LyapRendererBase> CreateRenderer);
