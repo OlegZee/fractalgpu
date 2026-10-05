@@ -1,0 +1,81 @@
+FractalGPU bench on iPad (iPadOS 27.0.1)
+Machine: iPad16,8, 8 cores, 11 GB
+System:  iOS 27.0.1 (Arm64), .NET 10.0.12
+Date:    2026-10-05 22:12
+Thermal: Nominal
+
+fractalgpu benchmark on [0] CPU (single core)
+Rendering time: 0.206s 303.96mis 'ab' N1000 256x256 @LyapRendererCpu
+Rendering time: 0.742s 336.88mis 'ab' N1000 512x512 @LyapRendererCpu
+Rendering time: 2.976s 335.98mis 'ab' N1000 1024x1024 @LyapRendererCpu
+Best: 336.88mis at 512x512 N1000 (total 3.9s)
+
+fractalgpu benchmark on [1] CPU (multi-core, 8 threads)
+Rendering time: 0.044s 1418.44mis 'ab' N1000 256x256 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 0.169s 1476.39mis 'ab' N1000 512x512 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 0.655s 1526.07mis 'ab' N1000 1024x1024 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 1.664s 1502.03mis 'ab' N2500 1024x1024 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Rendering time: 3.199s 1563.18mis 'ab' N5000 1024x1024 @LyapRendererMulticore<LyapRendererCpu>[256 tiles]
+Best: 1563.18mis at 1024x1024 N5000 (total 5.7s)
+
+fractalgpu benchmark on [2] CPU (single core, perf)
+  deferred log + SIMD: Vector<double> 2 lanes (128-bit)
+Rendering time: 0.027s 2315.87mis 'ab' N1000 256x256 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 0.100s 2501.66mis 'ab' N1000 512x512 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 0.399s 2503.66mis 'ab' N1000 1024x1024 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 0.950s 2630.82mis 'ab' N2500 1024x1024 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 1.867s 2678.21mis 'ab' N5000 1024x1024 @LyapRendererCpuPerf[2 lanes, deferred log]
+Rendering time: 3.698s 2703.87mis 'ab' N10000 1024x1024 @LyapRendererCpuPerf[2 lanes, deferred log]
+Best: 2703.87mis at 1024x1024 N10000 (total 7.0s)
+
+fractalgpu benchmark on [3] CPU (multi-core perf, 8 threads)
+  deferred log + SIMD: Vector<double> 2 lanes (128-bit)
+Rendering time: 0.043s 1468.78mis 'ab' N1000 256x256 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.068s 3691.62mis 'ab' N1000 512x512 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.150s 6669.75mis 'ab' N1000 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.341s 7321.93mis 'ab' N2500 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 0.661s 7564.8mis 'ab' N5000 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 1.198s 8345.48mis 'ab' N10000 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Rendering time: 3.134s 7976.84mis 'ab' N25000 1024x1024 @LyapRendererMulticore<LyapRendererCpuPerf>[256 tiles]
+Best: 8345.48mis at 1024x1024 N10000 (total 5.6s)
+
+fractalgpu benchmark on [4] Apple M4 GPU
+  (Metal)  mem: 8192 MB
+Rendering time: 0.067s 932.02mis 'ab' N1000 256x256 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 0.016s 15349.48mis 'ab' N1000 512x512 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 0.048s 21002.31mis 'ab' N1000 1024x1024 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 0.058s 43258.88mis 'ab' N2500 1024x1024 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 0.082s 60797.15mis 'ab' N5000 1024x1024 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 0.110s 91168.59mis 'ab' N10000 1024x1024 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 0.233s 107183.85mis 'ab' N25000 1024x1024 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 0.443s 112981.66mis 'ab' N50000 1024x1024 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 0.974s 115510.55mis 'ab' N50000 1536x1536 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 1.737s 115164.44mis 'ab' N50000 2048x2048 @LyapRendererMetal[Apple M4 GPU]
+Rendering time: 6.985s 114532.61mis 'ab' N50000 4096x4096 @LyapRendererMetal[Apple M4 GPU]
+Best: 115510.55mis at 1536x1536 N50000 (total 10.8s)
+
+fractalgpu benchmark on [5] Apple M4 GPU (perf)
+  (Metal)  mem: 8192 MB  fast-math: output statistically equivalent, not pixel-reproducible
+Rendering time: 0.035s 1769.99mis 'ab' N1000 256x256 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 0.009s 26893mis 'ab' N1000 512x512 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 0.033s 29911.01mis 'ab' N1000 1024x1024 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 0.032s 77633.72mis 'ab' N2500 1024x1024 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 0.040s 123777.39mis 'ab' N5000 1024x1024 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 0.050s 200978.77mis 'ab' N10000 1024x1024 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 0.090s 277067.25mis 'ab' N25000 1024x1024 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 0.158s 316094.19mis 'ab' N50000 1024x1024 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 0.347s 323953.74mis 'ab' N50000 1536x1536 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 0.624s 320365.78mis 'ab' N50000 2048x2048 @LyapRendererMetalPerf[Apple M4 GPU]
+Rendering time: 2.534s 315723.4mis 'ab' N50000 4096x4096 @LyapRendererMetalPerf[Apple M4 GPU]
+Best: 323953.74mis at 1536x1536 N50000 (total 4.0s)
+
+Summary (peak throughput):
+  Device                                    Peak mis  At                  x vs [0]
+  [0] CPU (single core)                        336.9  512x512 N1000           1.0x
+  [1] CPU (multi-core, 8 threads)            1,563.2  1024x1024 N5000         4.6x
+  [2] CPU (single core, perf)                2,703.9  1024x1024 N10000        8.0x
+  [3] CPU (multi-core perf, 8 threads)       8,345.5  1024x1024 N10000       24.8x
+  [4] Apple M4 GPU                         115,510.6  1536x1536 N50000      342.9x
+  [5] Apple M4 GPU (perf)                  323,953.7  1536x1536 N50000      961.6x
+
+Thermal at the end: Nominal
