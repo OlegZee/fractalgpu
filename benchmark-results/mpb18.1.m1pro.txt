@@ -1,0 +1,12 @@
+Machine: MacBookPro18,1, Apple M1 Pro, 10 cores, 16 GB
+System:  macOS 27.0.0 (Arm64), .NET 10.0.10
+Date:    2026-10-09 12:19
+
+Summary (peak throughput):
+  Device                                     Peak mis  At                  x vs [0]
+  [0] CPU (single core)                         227.0  1024x1024 N1000         1.0x
+  [1] CPU (multi-core, 10 threads)            1,805.0  1024x1024 N5000         8.0x
+  [2] CPU (single core, perf)                 1,921.1  1024x1024 N5000         8.5x
+  [3] CPU (multi-core perf, 10 threads)       8,854.3  1024x1024 N25000       39.0x
+  [4] Apple M1 Pro                          119,363.2  1536x1536 N50000      525.7x
+  [5] Apple M1 Pro (perf)                   380,466.9  1536x1536 N50000    1,675.7x
