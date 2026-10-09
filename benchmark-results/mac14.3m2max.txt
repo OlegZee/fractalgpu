@@ -1,0 +1,12 @@
+Machine: Mac14,13, Apple M2 Max, 12 cores, 32 GB
+System:  macOS 27.0.1 (Arm64), .NET 10.0.12
+Date:    2026-10-09 11:49
+
+Summary (peak throughput):
+  Device                                     Peak mis  At                  x vs [0]
+  [0] CPU (single core)                         238.9  1024x1024 N1000         1.0x
+  [1] CPU (multi-core, 12 threads)            1,985.9  1024x1024 N5000         8.3x
+  [2] CPU (single core, perf)                 2,045.4  1024x1024 N10000        8.6x
+  [3] CPU (multi-core perf, 12 threads)      10,468.7  1024x1024 N50000       43.8x
+  [4] Apple M2 Max                          230,408.7  1536x1536 N50000      964.4x
+  [5] Apple M2 Max (perf)                   643,143.8  1536x1536 N50000    2,692.1x
